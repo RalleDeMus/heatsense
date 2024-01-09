@@ -11,68 +11,75 @@ class BottomNavigationBarExample extends StatefulWidget {
 class _BottomNavigationBarExampleState
     extends State<BottomNavigationBarExample> {
   int _selectedIndex = 0;
-
+  bool light = true;
   static const TextStyle optionStyle = TextStyle(fontSize: 40);
 
   final List<Widget> _widgetOptions = [
     Scaffold(
       body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(Icons.location_pin),
-            Text(
-              'Sweden',
-              style: optionStyle,
-            ),
-            Text('19° Feels like: 26°'),
-            Text('No risk of heatstroke'),
-          ],
+        child: Card(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Icon(
+                Icons.location_pin,
+                size: 56,
+              ),
+              Text(
+                'Sweden',
+                style: optionStyle,
+              ),
+              Text(
+                '19° Feels like: 26°',
+                textScaleFactor: 2,
+              ),
+              Text('No risk of heatstroke'),
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        foregroundColor: Colors.blue,
-        backgroundColor: Colors.black,
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.grey,
         onPressed: () {},
         child: const Icon(Icons.bluetooth),
       ),
     ),
     Card(
       clipBehavior: Clip.hardEdge,
+      elevation: 0,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           const ListTile(
             title: Text('Event 1'),
             subtitle: Text('08-01-2024'),
           ),
-          Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
+          Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
             TextButton(
               child: const Text('Edit Event'),
               onPressed: () {/* ... */},
             ),
-            const SizedBox(width: 4),
           ]),
         ],
       ),
     ),
-    Card(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          const ListTile(
-            leading: Icon(Icons.album),
-            title: Text('Event 2'),
-            subtitle: Text('08-01-2024'),
-          ),
-          Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
-            TextButton(
-              child: const Text('Edit Event'),
-              onPressed: () {/* ... */},
+    const Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Icon(
+              Icons.person,
+              size: 130,
             ),
-            const SizedBox(width: 4),
-          ]),
-        ],
+            Text(
+              'Username',
+              style: optionStyle,
+            ),
+          ],
+        ),
       ),
     )
   ];
