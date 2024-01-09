@@ -1,141 +1,127 @@
-/**part of heatsense;
+part of heatsense;
 
+abstract class MoveSenseBLESensor implements BLESensor {
+  StreamSubscription<dynamic>? _subscription;
 
-class MoveSenseBLESensor implements BLESensor {
-  final _heartRateController = StreamController<int>.broadcast();
+  // The follow code controls the state management and stream of state changes.
+  final _controller = StreamController<int>.broadcast();
 
-  //StreamSubscription<PolarHrData>? _hrSubscription;
+  final StreamController<DeviceState> _stateChangeController =
+      StreamController.broadcast();
+  DeviceState _state = DeviceState.unknown;
 
-  final movesense = ;
-  String id;
-
-  MoveSenseBLESensor(this.id);
-
-  @override
-  String get name => 'MoveSense';
-
-  @override
-  String? get address => id;
-
-  @override
-  //Stream<String> get batteryStatus => _batteryController.stream;
-
-  bool _isConnected = false;
-  @override
-  bool get isConnected => _isConnected;
-
-  final _activeStatusController = StreamController<bool>.broadcast();
-  @override
-  Stream<bool> get isActive => _activeStatusController.stream;
+  set state(DeviceState state) {
+    print('The device with id $identifier is ${state.name}.');
+    _state = state;
+    _stateChangeController.add(state);
+  }
 
   @override
-  Stream<int> get heartRate => _heartRateController.stream;
+  DeviceState get state => _state;
 
   @override
+  Stream<DeviceState> get stateChange => _stateChangeController.stream;
+
+  @override
+  Stream<int> get heartbeat => _controller.stream;
+
+  @override
+  Future<void> init() async {
+    if (!(await hasPermissions)) await requestPermissions();
+  }
+
   Future<bool> get hasPermissions async =>
       await Permission.bluetoothScan.isGranted &&
       await Permission.bluetoothConnect.isGranted;
 
-  @override
+  /// Request the required Bluetooth permissions.
   Future<void> requestPermissions() async => await [
         Permission.bluetooth,
         Permission.bluetoothScan,
-        Permission.bluetoothConnect
+        Permission.bluetoothConnect,
       ].request();
 
   @override
-  Future<void> connect() async {
-    if (!(await hasPermissions)) await requestPermissions();
+  bool get isRunning => state == DeviceState.sampling;
 
-    polar
-        .searchForDevice()
-        .listen((event) => print('Found device in scan: ${event.deviceId}'));
+  /// Pause collection of HR data.
+  void pause() => _subscription?.pause();
 
-    polar.deviceConnecting.listen(
-        (event) => print('Connecting to device - id:${event.deviceId}'));
-    polar.deviceConnected.listen((event) {
-      print('Device connected');
-      _isConnected = true;
-      batteryStream();
-    });
-
-    polar.deviceDisconnected.listen((event) {
-      print('Device disconnected');
-      _isConnected = false;
-    });
-
-    polar.batteryLevel.listen((event) => print('Battery: ${event.level}'));
-    polar.blePowerState.listen((event) => print('BLE Power State is: $event'));
-    polar.disInformation
-        .listen((event) => print('Device DIS info: ${event.info}'));
-    polar.sdkFeatureReady
-        .listen((event) => print('Device SDK Feature: ${event.feature}'));
-
-    print('Connecting to device, id: $id');
-    await polar.connectToDevice(id);
-  }
-
-  @override
-  Future<void> disconnect() async {
-    polar.disconnectFromDevice('B36B5B21').then((_) {
-      print('Disconnected from the device');
-      _isConnected = false;
-      _batterySubscription?.cancel();
-      _batteryController.add("no data");
-    }).catchError((error) {
-      print('Disconnect failed: $error');
-    });
-  }
-
-  void batteryStream() async {
-    if (!_isConnected) {
-      return;
-    }
-
-    _batterySubscription?.cancel();
-
-    _batterySubscription = polar.batteryLevel.listen((event) {
-      print('Battery: ${event.level}');
-      _batteryController.add("${event.level}%");
-    }, onError: (e) {
-      print('Error listening to battery level: $e');
-    });
-    print("battery subbed");
-  }
-
-  @override
-  void start() async {
-    if (isConnected) {
-      _activeStatusController.add(true);
-
-      _hrSubscription?.cancel();
-      _batterySubscription?.cancel();
-
-      _hrSubscription = polar.startHrStreaming(id).listen((PolarHrData event) {
-        _heartRateController.add(event.samples.first.hr);
-        print('hr: ${event.samples.first.hr}');
-      });
-
-      _batterySubscription =
-          polar.batteryLevel.listen((PolarBatteryLevelEvent event) {
-        print('Battery Level Event: $event');
-
-        _batteryController.add('${event.level}%');
-      }, onError: (e) {
-        print('Error listening to battery level: $e');
-      });
-    }
-  }
+  /// Resume collection of HR data.
+  void resume() => _subscription?.resume();
 
   @override
   void stop() {
-    _hrSubscription?.cancel();
-    _hrSubscription = null;
-
-    _batterySubscription?.cancel();
-    _batterySubscription = null;
-
-    _activeStatusController.add(false);
+    _subscription?.cancel();
+    state = DeviceState.connected;
   }
 }
-**/
+
+class MovesenseHRMonitor extends MoveSenseBLESensor {
+  String? _address, _name, _serial;
+
+  @override
+  String get identifier => _address!;
+
+  /// The BLE address of the device.
+  String get address => _address!;
+
+  /// The name of the device.
+  String? get serial => _serial;
+
+  /// The serial number of the device.
+  String? get name => _name;
+
+  MovesenseHRMonitor(this._address, [this._name]);
+
+  static List<MovesenseHRMonitor> devices = [];
+
+  static void startScan() {
+    try {
+      Mds.startScan((name, address) {
+        var device = MovesenseHRMonitor(address, name);
+        print('Device found, address: $address');
+        if (!devices.contains(device)) {
+          devices.add(device);
+        }
+      });
+    } on Error {
+      print('Error during scanning');
+    }
+  }
+
+  @override
+  Future<void> init() async {
+    state = DeviceState.initialized;
+    if (!(await hasPermissions)) await requestPermissions();
+
+    // Start connecting to the Movesense device with the specified address.
+    state = DeviceState.connecting;
+    Mds.connect(
+      address,
+      (serial) {
+        _serial = serial;
+        state = DeviceState.connected;
+      },
+      () => state = DeviceState.disconnected,
+      () => state = DeviceState.error,
+    );
+  }
+
+  @override
+  void start() {
+    if (state == DeviceState.connected && _serial != null) {
+      _subscription = MdsAsync.subscribe(
+              Mds.createSubscriptionUri(_serial!, "/Meas/HR"), "{}")
+          .listen((event) {
+        print('>> $event');
+        num hr = event["Body"]["average"];
+        _controller.add(hr.toInt());
+      });
+      state = DeviceState.sampling;
+    }
+  }
+
+  /// Disconnect from the Movesense device.
+  void disconnect() => Mds.disconnect(address);
+}

@@ -1,27 +1,37 @@
 part of heatsense;
 
-abstract interface class BLESensor {
-  String? get address;
+enum DeviceState {
+  unknown,
+  initialized,
+  connecting,
+  connected,
+  sampling,
+  disconnected,
+  error,
+}
 
-  Stream<String> get batteryStatus;
+abstract class BLESensor {
+  /// The identifier of this monitor.
+  String get identifier;
 
-  bool get isConnected;
+  /// The state of this monitor.
+  DeviceState get state;
 
-  Stream<int> get heartRate;
+  /// The stream of state changes of this monitor.
+  Stream<DeviceState> get stateChange;
 
-  Stream<bool> get isActive;
+  /// The stream of heartbeat measures from this HR monitor.
+  Stream<int> get heartbeat;
 
-  Future<bool> get hasPermissions;
+  /// Has this monitor been started via the [start] command?
+  bool get isRunning;
 
-  Future<void> requestPermissions();
+  /// Initialize this HR monitor.
+  Future<void> init();
 
-  Future<void> connect();
-
-  Future<void> disconnect();
-
-  String get name;
-
+  /// Start this HR monitor.
   void start();
 
+  /// Stop this HR monitor.
   void stop();
 }
