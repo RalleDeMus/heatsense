@@ -1,6 +1,6 @@
 part of heatsense;
 
-final MovesenseHRMonitor monitor = MovesenseHRMonitor('0C:8C:DC:1B:23:18');
+final MovesenseHRMonitor monitor = MovesenseHRMonitor('0C:8C:DC:3F:B2:CD');
 
 class BottomNavigationBarExample extends StatefulWidget {
   const BottomNavigationBarExample({super.key});
@@ -20,72 +20,89 @@ class _BottomNavigationBarExampleState
   @override
   void initState() {
     super.initState();
-    monitor.init();
   }
 
   final List<Widget> _widgetOptions = [
     Scaffold(
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: <Widget>[
-            const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Icon(
-                    Icons.location_on_outlined,
-                    size: 56,
-                  ),
-                  Text(
-                    'Sweden',
-                    style: optionStyle,
-                  ),
-                ]),
-            const Text(
-              '19°',
-              style: TextStyle(fontWeight: FontWeight.w300, fontSize: 64),
-            ),
-            const Text(
-              'Feels like: 26°',
-              style: TextStyle(fontWeight: FontWeight.w300),
-            ),
-            const Text('No risk of heatstroke'),
-            const SizedBox(
-              height: 110,
-            ),
-            StreamBuilder<int>(
-                stream: monitor.heartbeat,
-                builder: (context, snapshot) {
-                  var displayText = 'Heartrate: -- BPM';
-                  if (snapshot.hasData) {
-                    displayText = 'Heartrate: ${snapshot.data} BPM';
-                  }
-                  return Text(
-                    displayText,
-                    style: TextStyle(fontSize: 20),
-                  );
-                }),
-            StreamBuilder<DeviceState>(
-              stream: monitor.stateChange,
-              builder: (context, snapshot) => Text(
-                  'Device [${monitor.identifier}] - ${monitor.state.name}'),
-            ),
-            const SizedBox(
-              height: 110,
-            ),
-            const Text(
-              'Body Temperature: C°',
-              style: TextStyle(fontSize: 20),
-            ),
-          ],
-        ),
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(
+                      Icons.location_on_outlined,
+                      size: 56,
+                    ),
+                    Text(
+                      'Sweden',
+                      style: optionStyle,
+                    ),
+                  ]),
+              const Text(
+                '19°',
+                style: TextStyle(fontWeight: FontWeight.w300, fontSize: 64),
+              ),
+              const Text(
+                'Feels like: 26°',
+                style: TextStyle(fontWeight: FontWeight.w300),
+              ),
+              const Text('No risk of heatstroke'),
+              const SizedBox(
+                height: 90,
+              ),
+              StreamBuilder<int>(
+                  stream: monitor.heartbeat,
+                  builder: (context, snapshot) {
+                    var displayText = 'Heartrate: -- BPM';
+                    if (snapshot.hasData) {
+                      displayText = 'Heartrate: ${snapshot.data} BPM';
+                    }
+                    return Text(
+                      displayText,
+                      style: TextStyle(fontSize: 20),
+                    );
+                  }),
+              const SizedBox(
+                height: 90,
+              ),
+              StreamBuilder<String>(
+                  stream: monitor.temperature,
+                  builder: (context, snapshot) {
+                    var displayText = 'Body Temperature: -- C°';
+                    if (snapshot.hasData) {
+                      displayText = 'Body Temperature: ${snapshot.data} C°';
+                    }
+                    return Text(
+                      displayText,
+                      style: TextStyle(fontSize: 20),
+                    );
+                  }),
+              SizedBox(
+                height: 100,
+              ),
+              ScanRoute(),
+            ]),
       ),
       floatingActionButton: FloatingActionButton(
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.grey,
-        onPressed: () {},
-        child: const Icon(Icons.bluetooth),
-      ),
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.blue,
+          onPressed: () {
+            if (monitor.isRunning) {
+              monitor.stopHR();
+              monitor.stopTemp();
+            } else {
+              monitor.startHR();
+              monitor.startTemp();
+            }
+          },
+          child: StreamBuilder<DeviceState>(
+            stream: monitor.stateChange,
+            builder: (context, snapshot) => (monitor.isRunning)
+                ? const Icon(Icons.stop)
+                : const Icon(Icons.play_arrow),
+          )),
     ),
     const Route(),
     Scaffold(
@@ -113,15 +130,11 @@ class _BottomNavigationBarExampleState
             const SizedBox(
               height: 30,
             ),
-            ElevatedButton(
-                onPressed: () {
-                  if (monitor.isRunning) {
-                    monitor.stop();
-                  } else {
-                    monitor.start();
-                  }
-                },
-                child: const Text('Scan for devices')),
+            StreamBuilder<DeviceState>(
+              stream: monitor.stateChange,
+              builder: (context, snapshot) => Text(
+                  'Device [${monitor.identifier}] - ${monitor.state.name}'),
+            ),
           ],
         ),
       ),
@@ -169,49 +182,90 @@ class _BottomNavigationBarExampleState
   }
 }
 
+class ScanRoute extends StatelessWidget {
+  const ScanRoute({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+        onPressed: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ScanSecondRoute()));
+        },
+        child: const Text('Scan for devices'));
+  }
+}
+
+class ScanSecondRoute extends StatefulWidget {
+  const ScanSecondRoute({super.key});
+  @override
+  State<ScanSecondRoute> createState() => _ScanSecondRouteState();
+}
+
+class _ScanSecondRouteState extends State<ScanSecondRoute> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Scan for Devices'),
+      ),
+      body: Text('Hello'),
+    );
+  }
+}
+
 class Route extends StatelessWidget {
   const Route({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Card(
-        clipBehavior: Clip.hardEdge,
-        elevation: 0,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            const ListTile(
-              title: Text('Event 1'),
-              subtitle: Text('08-01-2024'),
-            ),
-            Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
-              TextButton(
-                child: const Text('Edit Event'),
-                onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => SecondRoute()));
-                },
+      body: ListView(children: [
+        Card(
+          clipBehavior: Clip.hardEdge,
+          elevation: 0,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const ListTile(
+                title: Text('Event 1'),
+                subtitle: Text('08-01-2024'),
               ),
-            ]),
-          ],
+              Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
+                TextButton(
+                  child: const Text('Edit Event'),
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => SecondRoute()));
+                  },
+                ),
+              ]),
+            ],
+          ),
         ),
-      ),
+      ]),
     );
   }
 }
 
-class SecondRoute extends StatelessWidget {
-  SecondRoute({super.key});
+class SecondRoute extends StatefulWidget {
+  const SecondRoute({super.key});
+  @override
+  State<SecondRoute> createState() => _SecondRouteState();
+}
+
+class _SecondRouteState extends State<SecondRoute> {
   var arrow = Icons.keyboard_arrow_right;
 
   void _onSymptomsTapped() {
-    if (arrow == Icons.keyboard_arrow_down) {
-      arrow = Icons.keyboard_arrow_right;
-    } else {
-      arrow = Icons.keyboard_arrow_down;
-    }
+    setState(() {
+      if (arrow == Icons.keyboard_arrow_down) {
+        arrow = Icons.keyboard_arrow_right;
+      } else {
+        arrow = Icons.keyboard_arrow_down;
+      }
+    });
   }
 
   @override
@@ -267,4 +321,24 @@ class SecondRoute extends StatelessWidget {
       ),
     );
   }
+
+  /*Widget _buildDeviceItem(BuildContext context, int index) {
+    return Card(
+      child: ListTile(
+        title: Text(model.deviceList[index].name!),
+        subtitle: Text(model.deviceList[index].address!),
+        trailing: Text(model.deviceList[index].connectionStatus.statusName),
+        onTap: () => model.connectToDevice(model.deviceList[index]),
+      ),
+    );
+  }
+
+  Widget _buildDeviceList(List<Device> deviceList) {
+    return new Expanded(
+        child: new ListView.builder(
+            itemCount: model.deviceList.length,
+            itemBuilder: (BuildContext context, int index) =>
+                _buildDeviceItem(context, index)));
+  }
+  */
 }

@@ -23,6 +23,8 @@ abstract class BLESensor {
   /// The stream of heartbeat measures from this HR monitor.
   Stream<int> get heartbeat;
 
+  Stream<String> get temperature;
+
   /// Has this monitor been started via the [start] command?
   bool get isRunning;
 
@@ -30,8 +32,12 @@ abstract class BLESensor {
   Future<void> init();
 
   /// Start this HR monitor.
-  void start();
+  void startHR();
+
+  void startTemp();
 
   /// Stop this HR monitor.
-  void stop();
+  void stopHR();
+
+  void stopTemp();
 }

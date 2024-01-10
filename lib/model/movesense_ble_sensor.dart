@@ -1,10 +1,12 @@
 part of heatsense;
 
 abstract class MoveSenseBLESensor implements BLESensor {
-  StreamSubscription<dynamic>? _subscription;
+  StreamSubscription<dynamic>? _hrSubscription;
+  StreamSubscription<dynamic>? _tempSubscription;
 
   // The follow code controls the state management and stream of state changes.
-  final _controller = StreamController<int>.broadcast();
+  final _hrController = StreamController<int>.broadcast();
+  final _tempController = StreamController<String>.broadcast();
 
   final StreamController<DeviceState> _stateChangeController =
       StreamController.broadcast();
@@ -23,7 +25,10 @@ abstract class MoveSenseBLESensor implements BLESensor {
   Stream<DeviceState> get stateChange => _stateChangeController.stream;
 
   @override
-  Stream<int> get heartbeat => _controller.stream;
+  Stream<int> get heartbeat => _hrController.stream;
+
+  @override
+  Stream<String> get temperature => _tempController.stream;
 
   @override
   Future<void> init() async {
@@ -45,14 +50,25 @@ abstract class MoveSenseBLESensor implements BLESensor {
   bool get isRunning => state == DeviceState.sampling;
 
   /// Pause collection of HR data.
-  void pause() => _subscription?.pause();
+  void pauseHR() => _hrSubscription?.pause();
 
   /// Resume collection of HR data.
-  void resume() => _subscription?.resume();
+  void resumeHR() => _hrSubscription?.resume();
 
   @override
-  void stop() {
-    _subscription?.cancel();
+  void stopHR() {
+    _hrSubscription?.cancel();
+    state = DeviceState.connected;
+  }
+
+  void pauseTemp() => _tempSubscription?.pause();
+
+  /// Resume collection of HR data.
+  void resumeTemp() => _tempSubscription?.resume();
+
+  @override
+  void stopTemp() {
+    _tempSubscription?.cancel();
     state = DeviceState.connected;
   }
 }
@@ -109,18 +125,46 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
   }
 
   @override
-  void start() {
+  void startHR() {
     if (state == DeviceState.connected && _serial != null) {
-      _subscription = MdsAsync.subscribe(
+      _hrSubscription = MdsAsync.subscribe(
               Mds.createSubscriptionUri(_serial!, "/Meas/HR"), "{}")
           .listen((event) {
         print('>> $event');
         num hr = event["Body"]["average"];
-        _controller.add(hr.toInt());
+        _hrController.add(hr.toInt());
       });
       state = DeviceState.sampling;
     }
   }
+
+  @override
+  void startTemp() async {
+    Timer.periodic(Duration(seconds: 2), (timer) {
+      if (state == DeviceState.connected && _serial != null) {
+        MdsAsync.get(Mds.createRequestUri(_serial!, "/Meas/Temp"), "{}")
+            .then((value) {
+          double kelvin = value["Measurement"];
+          double temperatureVal = kelvin - 273.15;
+          String temp = temperatureVal.toStringAsPrecision(3);
+          _tempController.add(temp);
+          print(">>> $temp");
+        });
+      }
+    });
+  }
+  /*if (state == DeviceState.connected && _serial != null) {
+      _tempSubscription = MdsAsync.subscribe(
+              Mds.createSubscriptionUri(_serial!, "/Meas/Temp"), "{}")
+          .listen((event) {
+        print('>>> $event');
+        num temp = event["Body"]["Measurement"];
+        _tempController.add(temp.toInt());
+      });
+      state = DeviceState.sampling;
+    
+      }
+    */
 
   /// Disconnect from the Movesense device.
   void disconnect() => Mds.disconnect(address);
