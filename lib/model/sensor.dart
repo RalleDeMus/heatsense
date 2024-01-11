@@ -12,7 +12,7 @@ enum DeviceState {
 
 abstract class BLESensor {
   /// The identifier of this monitor.
-  String get identifier;
+  String? get identifier;
 
   /// The state of this monitor.
   DeviceState get state;
@@ -40,4 +40,12 @@ abstract class BLESensor {
   void stopHR();
 
   void stopTemp();
+}
+
+abstract interface class DeviceControler {
+  List<MoveSenseBLESensor> get devices;
+
+  bool get isScanning;
+
+  void scan();
 }

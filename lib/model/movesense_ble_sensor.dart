@@ -77,7 +77,7 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
   String? _address, _name, _serial;
 
   @override
-  String get identifier => _address!;
+  String? get identifier => _address;
 
   /// The BLE address of the device.
   String get address => _address!;
@@ -89,22 +89,6 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
   String? get name => _name;
 
   MovesenseHRMonitor(this._address, [this._name]);
-
-  static List<MovesenseHRMonitor> devices = [];
-
-  static void startScan() {
-    try {
-      Mds.startScan((name, address) {
-        var device = MovesenseHRMonitor(address, name);
-        print('Device found, address: $address');
-        if (!devices.contains(device)) {
-          devices.add(device);
-        }
-      });
-    } on Error {
-      print('Error during scanning');
-    }
-  }
 
   @override
   Future<void> init() async {
@@ -139,8 +123,8 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
   }
 
   @override
-  void startTemp() async {
-    Timer.periodic(Duration(seconds: 2), (timer) {
+  void startTemp() {
+    Timer.periodic(const Duration(seconds: 2), (timer) {
       if (state == DeviceState.connected && _serial != null) {
         MdsAsync.get(Mds.createRequestUri(_serial!, "/Meas/Temp"), "{}")
             .then((value) {
