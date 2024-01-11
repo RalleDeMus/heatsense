@@ -8,43 +8,11 @@ abstract class MoveSenseBLESensor implements BLESensor {
   final _hrController = StreamController<int>.broadcast();
   final _tempController = StreamController<String>.broadcast();
 
-  final StreamController<DeviceState> _stateChangeController =
-      StreamController.broadcast();
-  DeviceState _state = DeviceState.unknown;
-
-  set state(DeviceState state) {
-    print('The device with id $identifier is ${state.name}.');
-    _state = state;
-    _stateChangeController.add(state);
-  }
-
-  @override
-  DeviceState get state => _state;
-
-  @override
-  Stream<DeviceState> get stateChange => _stateChangeController.stream;
-
   @override
   Stream<int> get heartbeat => _hrController.stream;
 
   @override
   Stream<String> get temperature => _tempController.stream;
-
-  @override
-  Future<void> init() async {
-    if (!(await hasPermissions)) await requestPermissions();
-  }
-
-  Future<bool> get hasPermissions async =>
-      await Permission.bluetoothScan.isGranted &&
-      await Permission.bluetoothConnect.isGranted;
-
-  /// Request the required Bluetooth permissions.
-  Future<void> requestPermissions() async => await [
-        Permission.bluetooth,
-        Permission.bluetoothScan,
-        Permission.bluetoothConnect,
-      ].request();
 
   @override
   bool get isRunning => state == DeviceState.sampling;
@@ -58,7 +26,6 @@ abstract class MoveSenseBLESensor implements BLESensor {
   @override
   void stopHR() {
     _hrSubscription?.cancel();
-    state = DeviceState.connected;
   }
 
   void pauseTemp() => _tempSubscription?.pause();
@@ -69,7 +36,6 @@ abstract class MoveSenseBLESensor implements BLESensor {
   @override
   void stopTemp() {
     _tempSubscription?.cancel();
-    state = DeviceState.connected;
   }
 }
 
@@ -78,6 +44,8 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
 
   @override
   String? get identifier => _address;
+
+  DeviceState get state => _state;
 
   /// The BLE address of the device.
   String get address => _address!;
@@ -88,25 +56,21 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
   /// The serial number of the device.
   String? get name => _name;
 
+  @override
+  Stream<DeviceState> get stateChange => _stateChangeController.stream;
+
   MovesenseHRMonitor(this._address, [this._name]);
 
-  @override
-  Future<void> init() async {
-    state = DeviceState.initialized;
-    if (!(await hasPermissions)) await requestPermissions();
+  final StreamController<DeviceState> _stateChangeController =
+      StreamController.broadcast();
+  DeviceState _state = DeviceState.unknown;
 
-    // Start connecting to the Movesense device with the specified address.
-    state = DeviceState.connecting;
-    Mds.connect(
-      address,
-      (serial) {
-        _serial = serial;
-        state = DeviceState.connected;
-      },
-      () => state = DeviceState.disconnected,
-      () => state = DeviceState.error,
-    );
+  set state(DeviceState state) {
+    _state = state;
+    _stateChangeController.add(state);
   }
+
+  Future<void> init() async {}
 
   @override
   void startHR() {

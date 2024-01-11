@@ -1,7 +1,5 @@
 part of heatsense;
 
-MovesenseHRMonitor monitor = MovesenseHRMonitor(""); //0C:8C:DC:3F:B2:CD
-
 class BottomNavigationBarHeatSense extends StatefulWidget {
   const BottomNavigationBarHeatSense({super.key});
 
@@ -86,36 +84,7 @@ class _ScanSecondRouteState extends State<ScanSecondRoute> {
     );
   }
 
-  Widget _buildDeviceList(List<MovesenseHRMonitor> deviceList) {
-    return Expanded(
-        child: ListView.builder(
-            itemCount: monitor.devices.length,
-            itemBuilder: (BuildContext context, int index) =>
-                _buildDeviceItem(context, index)));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Find Devices'),
-      ),
-      body: Column(children: [
-        ElevatedButton(
-            onPressed: () {
-              ChangeNotifierProvider(
-                create: (context) => AppModel(),
-                child: MaterialApp(
-                  home: ScanWidget(),
-                ),
-              );
-            },
-            child: const Text('Scan for devices')),
-        _buildDeviceList(monitor.devices)
-      ]),
-    );
-  }
-}
+  
 */
 
 

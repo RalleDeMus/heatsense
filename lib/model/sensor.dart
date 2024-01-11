@@ -42,10 +42,16 @@ abstract class BLESensor {
   void stopTemp();
 }
 
-abstract interface class DeviceControler {
-  List<MoveSenseBLESensor> get devices;
+abstract interface class DeviceController {
+  UnmodifiableListView<MovesenseHRMonitor> get devices;
 
   bool get isScanning;
 
   void scan();
+
+  DeviceState get state;
+
+  Stream<DeviceState> get stateChange;
+
+  String get connectedDeviceId;
 }

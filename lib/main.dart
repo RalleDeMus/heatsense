@@ -2,15 +2,10 @@ library heatsense;
 
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter/services.dart';
-import 'dart:convert';
 import 'dart:collection';
-
 import 'dart:async';
-import 'dart:math';
-
-import 'package:mdsflutter/Mds.dart';
 import 'package:provider/provider.dart';
+import 'package:mdsflutter/Mds.dart';
 
 part 'model/sensor.dart';
 part 'model/movesense_ble_sensor.dart';
