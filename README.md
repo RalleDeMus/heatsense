@@ -5,7 +5,8 @@ This project creates a flutter application that is capable of showing sensor dat
 #### Connecting to Movesense
 The phone use bluetooth to listen for devices. After listening a list of detected device(s) can be choosen.
 
-` @override
+` 
+@override
   void scan() async {
     _devices.clear();
     notifyListeners();
@@ -26,11 +27,13 @@ The phone use bluetooth to listen for devices. After listening a list of detecte
     } on Error {
       print('Error during scanning');
     }
-  }`
+  }
+  `
 
   #### Listen to HR events
   
-  ' @override
+  ' 
+  @override
   void startHR() {
     if (state == DeviceState.connected && _serial != null) {
       _hrSubscription = MdsAsync.subscribe(
