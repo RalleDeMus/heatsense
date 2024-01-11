@@ -2,7 +2,7 @@
 
 This project creates a flutter application that is capable of showing sensor data. A Movesense device is used to measure Hearrate and temperute. The phones GPS is used to get location data. 
 
-#### Connecting to Movesense
+### Connecting to Movesense
 The phone use bluetooth to listen for devices. After listening a list of detected device(s) can be choosen.
 
 ` 
@@ -30,8 +30,8 @@ The phone use bluetooth to listen for devices. After listening a list of detecte
   }
   `
 
-  #### Listen to HR events
-  
+  ### Listen to HR events
+  listening to HR
   ' 
   @override
   void startHR() {
