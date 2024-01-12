@@ -93,7 +93,7 @@ Future<void> connect(MovesenseHRMonitor device) async {
 
 HeatSense consists of a Home Page, a Scan Page, an Event Page and a Profile Page, the Scan Page can be accessed through a button on the Home Page and the user can easily switch between the other pages by clicking on the navigationbar. 
 
-
+![text](images/MainPage.jpg)
 
 ### Home Page
 
