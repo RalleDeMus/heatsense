@@ -60,7 +60,6 @@ class _ScanPageState extends State<ScanPage> {
         subtitle: Text(devicecontrol.devices[index].address!),
         //trailing: Text(devicecontrol.devices[index].connectionStatus.statusName),
         onTap: () => {
-          devicecontrol.connect(devicecontrol.devices[index]),
           Navigator.pop(context, devicecontrol.devices[index].address),
         },
       ),

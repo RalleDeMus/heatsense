@@ -1,5 +1,7 @@
 part of heatsense;
 
+MovesenseHRMonitor monitor = MovesenseHRMonitor(""); //0C:8C:DC:3F:B2:CD
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -10,13 +12,18 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   static const TextStyle optionStyle = TextStyle(fontSize: 40);
 
-  final MovesenseHRMonitor monitor = MovesenseHRMonitor(""); //0C:8C:DC:3F:B2:CD
+  //final MovesenseHRMonitor monitor = MovesenseHRMonitor(""); //0C:8C:DC:3F:B2:CD
 
   Future<void> _returnwithconnection(BuildContext context) async {
     final deviceAddress = await Navigator.push(
         context, MaterialPageRoute(builder: (context) => const ScanPage()));
-    monitor._address = deviceAddress;
     setState(() {});
+
+    monitor = MovesenseHRMonitor(deviceAddress);
+    monitor.connect(monitor);
+    Timer(const Duration(seconds: 5), () {});
+
+    monitor.startTemp();
   }
 
   @override
@@ -92,10 +99,8 @@ class _HomePageState extends State<HomePage> {
           onPressed: () {
             if (monitor.isRunning) {
               monitor.stopHR();
-              monitor.stopTemp();
             } else {
               monitor.startHR();
-              monitor.startTemp();
             }
           },
           child: StreamBuilder<DeviceState>(

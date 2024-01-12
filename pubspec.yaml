@@ -39,6 +39,7 @@ dependencies:
   permission_handler: ^11.0.1
   animations: ^2.0.8
   provider: ^6.1.1
+  weather: ^3.1.1
 
 dev_dependencies:
   flutter_test:

@@ -72,6 +72,34 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
 
   Future<void> init() async {}
 
+  Future<bool> get hasPermissions async =>
+      await Permission.bluetoothScan.isGranted &&
+      await Permission.bluetoothConnect.isGranted;
+
+  /// Request the required Bluetooth permissions.
+  Future<void> requestPermissions() async => await [
+        Permission.bluetooth,
+        Permission.bluetoothScan,
+        Permission.bluetoothConnect,
+      ].request();
+
+  Future<void> connect(MovesenseHRMonitor device) async {
+    state = DeviceState.initialized;
+    if (!(await hasPermissions)) await requestPermissions();
+
+    // Start connecting to the Movesense device with the specified address.
+    state = DeviceState.connecting;
+    Mds.connect(
+      device.address,
+      (serial) {
+        _serial = serial;
+        state = DeviceState.connected;
+      },
+      () => state = DeviceState.disconnected,
+      () => state = DeviceState.error,
+    );
+  }
+
   @override
   void startHR() {
     if (state == DeviceState.connected && _serial != null) {

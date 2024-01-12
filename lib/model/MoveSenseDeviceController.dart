@@ -60,13 +60,14 @@ class MoveSenseDeviceController extends ChangeNotifier
     await init();
     try {
       _isScanning = true;
+      List<String> devicesadd = [];
       Timer(const Duration(seconds: 60), () => stopScan());
       Mds.startScan((name, address) {
         MovesenseHRMonitor device = MovesenseHRMonitor(address, name);
         print('Device found, address: $address');
-        if (!_devices.contains(device)) {
+        if (!devicesadd.contains(device.address)) {
           _devices.add(device);
-          _devicesController.add(device);
+          devicesadd.add(device.address);
           notifyListeners();
         }
       });
@@ -78,22 +79,5 @@ class MoveSenseDeviceController extends ChangeNotifier
   void stopScan() {
     _isScanning = false;
     Mds.stopScan();
-  }
-
-  Future<void> connect(MovesenseHRMonitor device) async {
-    state = DeviceState.initialized;
-    if (!(await hasPermissions)) await requestPermissions();
-
-    // Start connecting to the Movesense device with the specified address.
-    state = DeviceState.connecting;
-    Mds.connect(
-      device.address,
-      (serial) {
-        _serial = serial;
-        state = DeviceState.connected;
-      },
-      () => state = DeviceState.disconnected,
-      () => state = DeviceState.error,
-    );
   }
 }
