@@ -1,4 +1,4 @@
-# heatsense
+# HeatSense
 
 This project creates a flutter application that is capable of showing sensor data. A Movesense device is used to measure Hearrate and temperute. The phones GPS is used to get location data. 
 
