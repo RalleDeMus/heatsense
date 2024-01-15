@@ -23,23 +23,28 @@ abstract class BLESensor {
   /// The stream of heartbeat measures from this HR monitor.
   Stream<int> get heartbeat;
 
+  /// The stream of temperature measures from this HR monitor.
   Stream<String> get temperature;
+
+  /// The stream of temperature measures from this HR monitor.
+  Stream<List<String>> get ecg;
 
   /// Has this monitor been started via the [start] command?
   bool get isRunning;
 
-  /// Initialize this HR monitor.
-  Future<void> init();
-
-  /// Start this HR monitor.
+  /// Start different data collection.
   void startHR();
 
   void startTemp();
 
-  /// Stop this HR monitor.
+  void startECG();
+
+  /// Stop different data collection.
   void stopHR();
 
   void stopTemp();
+
+  void stopECG();
 }
 
 abstract interface class DeviceController {
@@ -49,9 +54,9 @@ abstract interface class DeviceController {
 
   void scan();
 
-  DeviceState get state;
+  //DeviceState get state;
 
-  Stream<DeviceState> get stateChange;
+  //Stream<DeviceState> get stateChange;
 
-  String get connectedDeviceId;
+  //String get connectedDeviceId;
 }

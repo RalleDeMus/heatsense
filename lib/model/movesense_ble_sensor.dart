@@ -3,16 +3,21 @@ part of heatsense;
 abstract class MoveSenseBLESensor implements BLESensor {
   StreamSubscription<dynamic>? _hrSubscription;
   StreamSubscription<dynamic>? _tempSubscription;
+  StreamSubscription<dynamic>? _ecgSubscription;
 
   // The follow code controls the state management and stream of state changes.
   final _hrController = StreamController<int>.broadcast();
   final _tempController = StreamController<String>.broadcast();
+  final _ecgController = StreamController<List<String>>.broadcast();
 
   @override
   Stream<int> get heartbeat => _hrController.stream;
 
   @override
   Stream<String> get temperature => _tempController.stream;
+
+  @override
+  Stream<List<String>> get ecg => _ecgController.stream;
 
   @override
   bool get isRunning => state == DeviceState.sampling;
@@ -23,19 +28,34 @@ abstract class MoveSenseBLESensor implements BLESensor {
   /// Resume collection of HR data.
   void resumeHR() => _hrSubscription?.resume();
 
+  /// Stop collection of HR data.
   @override
   void stopHR() {
     _hrSubscription?.cancel();
   }
 
+  /// Pause collection of temperature data.
   void pauseTemp() => _tempSubscription?.pause();
 
-  /// Resume collection of HR data.
+  /// Resume collection of temperature data.
   void resumeTemp() => _tempSubscription?.resume();
 
+  /// Stop collection of temperature data.
   @override
   void stopTemp() {
     _tempSubscription?.cancel();
+  }
+
+  /// Pause collection of ECG data.
+  void pauseECG() => _ecgSubscription?.pause();
+
+  /// Resume collection of ECG data.
+  void resumeECG() => _ecgSubscription?.resume();
+
+  /// Stop collection of ECG data.
+  @override
+  void stopECG() {
+    _ecgSubscription?.cancel();
   }
 }
 
@@ -45,6 +65,7 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
   @override
   String? get identifier => _address;
 
+  @override
   DeviceState get state => _state;
 
   /// The BLE address of the device.
@@ -70,27 +91,13 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
     _stateChangeController.add(state);
   }
 
-  Future<void> init() async {}
-
-  Future<bool> get hasPermissions async =>
-      await Permission.bluetoothScan.isGranted &&
-      await Permission.bluetoothConnect.isGranted;
-
-  /// Request the required Bluetooth permissions.
-  Future<void> requestPermissions() async => await [
-        Permission.bluetooth,
-        Permission.bluetoothScan,
-        Permission.bluetoothConnect,
-      ].request();
-
-  Future<void> connect(MovesenseHRMonitor device) async {
+  /// Start connecting to the Movesense device with the specified address.
+  Future<void> connect() async {
     state = DeviceState.initialized;
-    if (!(await hasPermissions)) await requestPermissions();
 
-    // Start connecting to the Movesense device with the specified address.
     state = DeviceState.connecting;
     Mds.connect(
-      device.address,
+      address,
       (serial) {
         _serial = serial;
         state = DeviceState.connected;
@@ -100,6 +107,7 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
     );
   }
 
+  /// Method for listening to heartrate data. The data is fed into a stream that can be listened to.
   @override
   void startHR() {
     if (state == DeviceState.connected && _serial != null) {
@@ -114,6 +122,7 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
     }
   }
 
+  /// Method for listening to temperature data. The data is fed into a stream that can be listened to.
   @override
   void startTemp() {
     Timer.periodic(const Duration(seconds: 2), (timer) {
@@ -129,19 +138,21 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
       }
     });
   }
-  /*if (state == DeviceState.connected && _serial != null) {
-      _tempSubscription = MdsAsync.subscribe(
-              Mds.createSubscriptionUri(_serial!, "/Meas/Temp"), "{}")
+
+  /// Method for listening to ECG data. The data is fed into a stream that can be listened to.
+  @override
+  void startECG() {
+    if (state == DeviceState.connected && _serial != null) {
+      _ecgSubscription = MdsAsync.subscribe(
+              Mds.createSubscriptionUri(_serial!, "/Meas/ECG/125"), "{}")
           .listen((event) {
-        print('>>> $event');
-        num temp = event["Body"]["Measurement"];
-        _tempController.add(temp.toInt());
+        print('>> $event');
+        List<String> ecg = event["Body"]["Samples"];
+        _ecgController.add(ecg);
       });
       state = DeviceState.sampling;
-    
-      }
-    */
+    }
+  }
 
-  /// Disconnect from the Movesense device.
   void disconnect() => Mds.disconnect(address);
 }

@@ -1,7 +1,9 @@
 part of heatsense;
 
 class EventPage extends StatefulWidget {
-  const EventPage({super.key});
+  final EventPageViewModel model;
+
+  const EventPage({required this.model, super.key});
 
   @override
   State<EventPage> createState() => _EventPageState();
