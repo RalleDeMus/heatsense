@@ -1,9 +1,10 @@
 part of heatsense;
 
-MovesenseHRMonitor monitor = MovesenseHRMonitor(""); //0C:8C:DC:3F:B2:CD
+//MovesenseHRMonitor monitor = MovesenseHRMonitor("");
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final HomePageViewModel model;
+  const HomePage({required this.model, super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -12,128 +13,133 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   static const TextStyle optionStyle = TextStyle(fontSize: 40);
 
-  //final MovesenseHRMonitor monitor = MovesenseHRMonitor(""); //0C:8C:DC:3F:B2:CD
+  //0C:8C:DC:3F:B2:CD
 
-  Future<void> _returnwithconnection(BuildContext context) async {
+  /*  Future<void> _returnwithconnection(BuildContext context) async {
     final deviceAddress = await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const ScanPage()));
+        context, MaterialPageRoute(builder: (context) => ScanPage()));
     setState(() {});
 
     monitor = MovesenseHRMonitor(deviceAddress);
     monitor.connect(monitor);
     Timer(const Duration(seconds: 5), () {});
 
-    monitor.startTemp();
-  }
+    //monitor.startTemp();
+  } */
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-            const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Icon(
-                    Icons.location_on_outlined,
-                    size: 56,
-                  ),
-                  Text(
-                    'Sweden',
-                    style: optionStyle,
-                  ),
-                ]),
-            const Text(
-              '19°',
-              style: TextStyle(fontWeight: FontWeight.w300, fontSize: 64),
-            ),
-            const Text(
-              'Feels like: 26°',
-              style: TextStyle(fontWeight: FontWeight.w300),
-            ),
-            const Text('No risk of heatstroke'),
-            const SizedBox(
-              height: 90,
-            ),
-            StreamBuilder<int>(
-                stream: monitor.heartbeat,
-                builder: (context, snapshot) {
-                  var displayText = 'Heartrate: -- BPM';
-                  if (snapshot.hasData) {
-                    displayText = 'Heartrate: ${snapshot.data} BPM';
-                  }
-                  return Text(
-                    displayText,
-                    style: TextStyle(fontSize: 20),
-                  );
-                }),
-            const SizedBox(
-              height: 90,
-            ),
-            StreamBuilder<String>(
-                stream: monitor.temperature,
-                builder: (context, snapshot) {
-                  var displayText = 'Body Temperature: -- C°';
-                  if (snapshot.hasData) {
-                    displayText = 'Body Temperature: ${snapshot.data} C°';
-                  }
-                  return Text(
-                    displayText,
-                    style: TextStyle(fontSize: 20),
-                  );
-                }),
-            SizedBox(
-              height: 100,
-            ),
-            ElevatedButton(
-                onPressed: () {
-                  _returnwithconnection(context);
-                },
-                child: const Text('Scan for devices')),
-          ])),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(
+                      Icons.location_on_outlined,
+                      size: 56,
+                    ),
+                    Text(
+                      'Sweden',
+                      style: optionStyle,
+                    ),
+                  ]),
+              const Text(
+                '19°',
+                style: TextStyle(fontWeight: FontWeight.w300, fontSize: 64),
+              ),
+              const Text(
+                'Feels like: 26°',
+                style: TextStyle(fontWeight: FontWeight.w300),
+              ),
+              const Text('No risk of heatstroke'),
+              const SizedBox(
+                height: 70,
+              ),
+              ListenableBuilder(
+                listenable: widget.model,
+                builder: (BuildContext context, child) => StreamBuilder<int>(
+                    stream: widget.model.hr,
+                    builder: (context, snapshot) {
+                      var displayText = 'Heartrate: -- BPM';
+                      if (snapshot.hasData) {
+                        displayText = 'Heartrate: ${snapshot.data} BPM';
+                      }
+                      return Text(
+                        displayText,
+                        style: TextStyle(fontSize: 20),
+                      );
+                    }),
+              ),
+              const SizedBox(
+                height: 70,
+              ),
+              ListenableBuilder(
+                listenable: widget.model,
+                builder: (BuildContext context, child) => StreamBuilder<String>(
+                    stream: widget.model.temp,
+                    builder: (context, snapshot) {
+                      var displayText = 'Body Temperature: -- C°';
+                      if (snapshot.hasData) {
+                        displayText = 'Body Temperature: ${snapshot.data} C°';
+                      }
+                      return Text(
+                        displayText,
+                        style: TextStyle(fontSize: 20),
+                      );
+                    }),
+              ),
+              const SizedBox(
+                height: 70,
+              ),
+              ListenableBuilder(
+                  listenable: widget.model,
+                  builder: (BuildContext context, child) =>
+                      StreamBuilder<List<String>>(
+                          stream: widget.model.ecg,
+                          builder: (context, snapshot) {
+                            var displayText = 'ECG Data: -- ';
+                            if (snapshot.hasData) {
+                              displayText = 'ECG Data: ${snapshot.data} ';
+                            }
+                            return Text(
+                              displayText,
+                              style: TextStyle(fontSize: 20),
+                            );
+                          })),
+              const SizedBox(
+                height: 90,
+              ),
+              ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => ScanPage()));
+                    widget.model.startTemp();
+                  },
+                  child: const Text('Scan for devices')),
+              const SizedBox(height: 10),
+              StreamBuilder<DeviceState>(
+                  stream: widget.model.stateChange,
+                  builder: (context, snapshot) {
+                    return Text('Device is currently: ${snapshot.data}',
+                        style: const TextStyle(fontSize: 10));
+                  })
+            ]),
+      ),
       floatingActionButton: FloatingActionButton(
           foregroundColor: Colors.white,
           backgroundColor: Colors.blue,
           onPressed: () {
-            if (monitor.isRunning) {
-              monitor.stopHR();
-            } else {
-              monitor.startHR();
-            }
+            widget.model.startECGHR();
           },
           child: StreamBuilder<DeviceState>(
-            stream: monitor.stateChange,
-            builder: (context, snapshot) => (monitor.isRunning)
+            stream: widget.model.stateChange,
+            builder: (context, snapshot) => (widget.model.running)
                 ? const Icon(Icons.stop)
                 : const Icon(Icons.play_arrow),
           )),
     );
   }
 }
-
-/*class ScanRoute extends StatefulWidget{
-  const ScanRoute({super.key});
-  @override
-  State<ScanRoute> createState() => _ScanRouteState();
-}
-
-class _ScanRouteState extends State<ScanRoute> {
-  
-
-  @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-        onPressed: () {
-          _returnwithconnection(context);
-        },
-        child: const Text('Scan for devices'));
-  }
-
-  Future<void> _returnwithconnection(BuildContext context) async {
-    final deviceAddress = await Navigator.push(
-    context,
-    MaterialPageRoute(builder: (context) => const ScanPage()));
-  }
-}*/

@@ -1,42 +1,58 @@
 part of heatsense;
 
-class MoveSenseDeviceController extends ChangeNotifier
-    implements DeviceController {
+// Singleton devicecontroller for handling the scan for devices
+class MoveSenseDeviceController implements DeviceController {
+// make class singleton
+  static final MoveSenseDeviceController _instance =
+      MoveSenseDeviceController._();
+  MoveSenseDeviceController._();
+  factory MoveSenseDeviceController() => _instance;
+
   String? _serial;
+  bool _isScanning = false;
+
   final Set<MovesenseHRMonitor> _devices = {};
   final _devicesController = StreamController<MovesenseHRMonitor>.broadcast();
 
-  @override
-  String connectedDeviceId = "";
-
   Stream<MovesenseHRMonitor> get devicestream => _devicesController.stream;
+
+  /// The device that the user has selected to connect to. Null if not yet selected.
+  MovesenseHRMonitor? connectedDevice;
+
+  void setConnectedDeviceByIndex(int index) => connectedDevice = devices[index];
+
+  Future<void> setConnectedDeviceAndConnect(MovesenseHRMonitor device) async {
+    connectedDevice = device;
+    await connectedDevice?.connect();
+  }
 
   String? get serial => _serial;
 
-  bool _isScanning = false;
+  @override
+  bool get isScanning => _isScanning;
 
+  /* 
   final StreamController<DeviceState> _stateChangeController =
       StreamController.broadcast();
-  DeviceState _state = DeviceState.unknown;
 
+  DeviceState _state = DeviceState.unknown;
+ 
   set state(DeviceState state) {
     _state = state;
     _stateChangeController.add(state);
   }
-
+  
   @override
   DeviceState get state => _state;
 
   @override
   Stream<DeviceState> get stateChange => _stateChangeController.stream;
-
+  */
   @override
   UnmodifiableListView<MovesenseHRMonitor> get devices =>
       UnmodifiableListView(_devices);
 
-  @override
-  bool get isScanning => _isScanning;
-
+  //asks for permission to use bluetooth
   Future<bool> get hasPermissions async =>
       await Permission.bluetoothScan.isGranted &&
       await Permission.bluetoothConnect.isGranted;
@@ -53,9 +69,10 @@ class MoveSenseDeviceController extends ChangeNotifier
   }
 
   @override
+  //The app uses this method to connect to a selected device.
   void scan() async {
     _devices.clear();
-    notifyListeners();
+    //notifyListeners();
 
     await init();
     try {
@@ -68,7 +85,6 @@ class MoveSenseDeviceController extends ChangeNotifier
         if (!devicesadd.contains(device.address)) {
           _devices.add(device);
           devicesadd.add(device.address);
-          notifyListeners();
         }
       });
     } on Error {

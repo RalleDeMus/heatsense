@@ -1,7 +1,8 @@
 part of heatsense;
 
 class ScanPage extends StatefulWidget {
-  const ScanPage({super.key});
+  /*  final ScanPageViewModel model; */
+  const ScanPage({/* required this.model, */ super.key});
 
   @override
   State<ScanPage> createState() => _ScanPageState();
@@ -9,11 +10,13 @@ class ScanPage extends StatefulWidget {
 
 @override
 class _ScanPageState extends State<ScanPage> {
-  MoveSenseDeviceController devicecontrol = MoveSenseDeviceController();
-
   @override
   void initState() {
     super.initState();
+    MoveSenseDeviceController().scan();
+    Timer(const Duration(seconds: 5), () {
+      reload();
+    });
   }
 
   void reload() {
@@ -30,15 +33,15 @@ class _ScanPageState extends State<ScanPage> {
       body: Center(
         child: Column(
           children: [
-            ElevatedButton(
+            /* ElevatedButton(
                 onPressed: () {
-                  devicecontrol.scan();
+                  MoveSenseDeviceController().scan();
                   Timer(const Duration(seconds: 5), () {
                     reload();
                   });
                 },
-                child: Text('Start Scan')),
-            _buildDeviceList(devicecontrol.devices),
+                child:  Text('Start Scan')),*/
+            _buildDeviceList(MoveSenseDeviceController().devices),
           ],
         ),
       ),
@@ -48,7 +51,7 @@ class _ScanPageState extends State<ScanPage> {
   Widget _buildDeviceList(List<MovesenseHRMonitor> deviceList) {
     return Expanded(
         child: ListView.builder(
-            itemCount: devicecontrol.devices.length,
+            itemCount: MoveSenseDeviceController().devices.length,
             itemBuilder: (BuildContext context, int index) =>
                 _buildDeviceItem(context, index)));
   }
@@ -56,11 +59,14 @@ class _ScanPageState extends State<ScanPage> {
   Widget _buildDeviceItem(BuildContext context, int index) {
     return Card(
       child: ListTile(
-        title: Text(devicecontrol.devices[index].name!),
-        subtitle: Text(devicecontrol.devices[index].address!),
+        title: Text(MoveSenseDeviceController().devices[index].name!),
+        subtitle: Text(MoveSenseDeviceController().devices[index].address!),
         //trailing: Text(devicecontrol.devices[index].connectionStatus.statusName),
-        onTap: () => {
-          Navigator.pop(context, devicecontrol.devices[index].address),
+        onTap: () {
+          //MoveSenseDeviceController().setConnectedDeviceByIndex(index);
+          MoveSenseDeviceController().setConnectedDeviceAndConnect(
+              MoveSenseDeviceController().devices[index]);
+          Navigator.pop(context);
         },
       ),
     );

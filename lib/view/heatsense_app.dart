@@ -1,7 +1,8 @@
 part of heatsense;
 
 class BottomNavigationBarHeatSense extends StatefulWidget {
-  const BottomNavigationBarHeatSense({super.key});
+  const BottomNavigationBarHeatSense({super.key, required this.model});
+  final AppViewModel model;
 
   @override
   State<BottomNavigationBarHeatSense> createState() =>
@@ -11,17 +12,23 @@ class BottomNavigationBarHeatSense extends StatefulWidget {
 class _BottomNavigationBarHeatSenseState
     extends State<BottomNavigationBarHeatSense> {
   int _selectedIndex = 0;
+  final List<Widget> _widgetOptions = [];
+
+  _BottomNavigationBarHeatSenseState();
 
   @override
   void initState() {
     super.initState();
+    _widgetOptions.add(HomePage(model: widget.model.homeModel));
+    _widgetOptions.add(EventPage(model: widget.model.eventList));
+    _widgetOptions.add(ProfilePage());
   }
 
-  final List<Widget> _widgetOptions = [
+/*   final List<Widget> _widgetOptions = [
     const HomePage(),
-    const EventPage(),
+    EventPage(model: widget.model.eventList),
     const ProfilePage(),
-  ];
+  ]; */
 
   void _onItemTapped(int index) {
     setState(() {
