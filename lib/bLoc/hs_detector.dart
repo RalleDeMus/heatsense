@@ -7,10 +7,12 @@ abstract interface class HSDetector {
   void stop();
 }
 
-class TimerHSDetector implements HSDetector {
+class TimerHSDetector extends ChangeNotifier implements HSDetector {
   static final TimerHSDetector _instance = TimerHSDetector._();
   TimerHSDetector._();
   factory TimerHSDetector() => _instance;
+
+  bool e = false;
 
   HSEventList list = HSEventList();
 
@@ -20,23 +22,34 @@ class TimerHSDetector implements HSDetector {
 
   @override
   Stream<HSEvent> get detectedEvents => _eventController.stream;
+
+  
   */
+  void addHSEvent(HSEvent event) {
+    list.events.add(event);
+    notifyListeners();
+  }
 
   @override
   void start() {
-    /* _eventSubscription?.resume(); */
+    if (!e) {
+      addHSEvent(event1);
+      e = true;
+    } else {
+      addHSEvent(event2);
+      e = false;
+    }
+
+    /*  Timer(const Duration(seconds: 10), () {
+      addHSEvent(event1);
+    });
+    Timer(const Duration(seconds: 10), () {
+      addHSEvent(event2);
+    }); */
   }
 
   @override
   void stop() {}
-
-  //
-}
-
-class TestHSDetector extends ChangeNotifier {
-  static final TestHSDetector _instance = TestHSDetector._();
-  TestHSDetector._();
-  factory TestHSDetector() => _instance;
 
   HSEvent event1 = HSEvent([
     80,
@@ -62,18 +75,10 @@ class TestHSDetector extends ChangeNotifier {
     [-10, 20, -3, 4],
     [1, 2, 3, 4, 5]
   ]);
+}
 
-  void addHSEvent(HSEvent event) {
-    TimerHSDetector().list.add(event);
-    notifyListeners();
-  }
-
-  void start() {
-    Timer(const Duration(seconds: 10), () {
-      addHSEvent(event1);
-    });
-    Timer(const Duration(seconds: 10), () {
-      addHSEvent(event2);
-    });
-  }
+class TestHSDetector extends ChangeNotifier {
+  static final TestHSDetector _instance = TestHSDetector._();
+  TestHSDetector._();
+  factory TestHSDetector() => _instance;
 }

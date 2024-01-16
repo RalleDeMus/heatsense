@@ -53,7 +53,7 @@ class Storage {
       hrJson['Data'] = [hrJson['hr'] = hr];
 
       // Add the json record to the database
-      store?.add(database, hrJson);
+      store?.add(database!, hrJson);
       print('>>>> $hrJson');
     });
 
@@ -63,7 +63,7 @@ class Storage {
       tempJson['Data'] = [tempJson['temp'] = temp];
 
       // Add the json record to the database
-      store?.add(database, tempJson);
+      store?.add(database!, tempJson);
       print('>>>> $tempJson');
     });
 
@@ -73,7 +73,7 @@ class Storage {
       ecgJson['Data'] = [ecgJson['ecg'] = echo];
 
       // Add the json record to the database
-      store?.add(database, ecgJson);
+      store?.add(database!, ecgJson);
       print('>>>> $ecgJson');
     });
 
@@ -87,13 +87,13 @@ class Storage {
   ///    count().then((count) => print('>> size: $count'));
   ///
   /// Returns -1 if unknown.
-  Future<int> count() async => await store?.count(database) ?? -1;
+  Future<int> count() async => await store?.count(database!) ?? -1;
 
   Future<List<RecordSnapshot<Object?, Object?>>> findJson() async {
     var finder = Finder(
         filter: Filter.greaterThan('timestamp', time),
         sortOrders: [SortOrder('timestamp')]);
-    var records = await store!.find(database, finder: finder);
+    var records = await store!.find(database!, finder: finder);
     //time = DateTime.now().microsecondsSinceEpoch;
     return records;
   }
@@ -105,13 +105,20 @@ class Storage {
         filter: Filter.greaterThan('timestamp', time),
         sortOrders: [SortOrder('timestamp')]);
     List<RecordSnapshot<Object?, Object?>> records =
-        await store!.find(database, finder: finder);
+        await store!.find(database!, finder: finder);
     List<Map<String, dynamic>> result = [];
     for (var record in records) {
       result.add({record.key.toString(): record.value});
     }
 
     return result;
+  }
+
+  void deleteDatabase() async {
+    database.close();
+    var dir = await getApplicationDocumentsDirectory();
+    var path = join(dir.path, 'HeatSense_data.db');
+    await databaseFactoryIo.deleteDatabase(path);
   }
 }
 

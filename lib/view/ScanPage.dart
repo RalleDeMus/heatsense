@@ -15,10 +15,6 @@ class _ScanPageState extends State<ScanPage> {
     MoveSenseDeviceController().scan();
   }
 
-  void reload() {
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,16 +25,15 @@ class _ScanPageState extends State<ScanPage> {
       body: Center(
         child: Column(
           children: [
-             ListenableBuilder(
-              listenable: MoveSenseDeviceController(), 
+            ListenableBuilder(
+              listenable: MoveSenseDeviceController(),
               builder: (BuildContext context, Widget? child) =>
-            _buildDeviceList(MoveSenseDeviceController().devices), 
+                  _buildDeviceList(MoveSenseDeviceController().devices),
             ),
           ],
         ),
       ),
     );
-
   }
 
   Widget _buildDeviceList(List<MovesenseHRMonitor> deviceList) {

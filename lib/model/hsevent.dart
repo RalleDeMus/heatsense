@@ -29,8 +29,4 @@ class HSEvent {
 
 class HSEventList {
   List<HSEvent> events = [];
-
-  void add(HSEvent event) {
-    events.add(event);
-  }
 }
