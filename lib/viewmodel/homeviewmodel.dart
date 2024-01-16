@@ -6,7 +6,7 @@ class HomePageViewModel extends ChangeNotifier {
 
   bool get running => hrMonitor?.isRunning ?? false;
 
-  Stream<DeviceState> get stateChange =>
+  Stream<DeviceState> get state =>
       hrMonitor?.stateChange ?? Stream.empty();
 
   Stream<int> get hr => hrMonitor?.heartbeat ?? Stream.empty();
