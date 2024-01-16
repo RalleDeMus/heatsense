@@ -12,7 +12,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   static const TextStyle optionStyle = TextStyle(fontSize: 40);
-
+  static const TextStyle streamStyle = TextStyle(fontSize: 20);
   //0C:8C:DC:3F:B2:CD
 
   /*  Future<void> _returnwithconnection(BuildContext context) async {
@@ -31,6 +31,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
+        child: SingleChildScrollView( //SingleChildScrollView if device screen is too small to display all information
         child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
@@ -39,21 +40,33 @@ class _HomePageState extends State<HomePage> {
                   children: <Widget>[
                     Icon(
                       Icons.location_on_outlined,
-                      size: 56,
+                      size: 40,
                     ),
                     Text(
                       'Sweden',
                       style: optionStyle,
                     ),
                   ]),
-              const Text(
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                Text('19°',
+                style: TextStyle(fontWeight: FontWeight.w300, fontSize: 30),
+                ),
+                Text('Feels like: 26°',
+                style: TextStyle(fontWeight: FontWeight.w300, fontSize: 30),
+                ),
+              ]
+              ),
+              
+             /*  const Text(
                 '19°',
                 style: TextStyle(fontWeight: FontWeight.w300, fontSize: 64),
               ),
               const Text(
                 'Feels like: 26°',
                 style: TextStyle(fontWeight: FontWeight.w300),
-              ),
+              ), */
               const Text('No risk of heatstroke'),
               const SizedBox(
                 height: 70,
@@ -69,7 +82,7 @@ class _HomePageState extends State<HomePage> {
                       }
                       return Text(
                         displayText,
-                        style: TextStyle(fontSize: 20),
+                        style: streamStyle,
                       );
                     }),
               ),
@@ -87,7 +100,7 @@ class _HomePageState extends State<HomePage> {
                       }
                       return Text(
                         displayText,
-                        style: TextStyle(fontSize: 20),
+                        style: streamStyle,
                       );
                     }),
               ),
@@ -106,7 +119,7 @@ class _HomePageState extends State<HomePage> {
                             }
                             return Text(
                               displayText,
-                              style: TextStyle(fontSize: 20),
+                              style: streamStyle,
                             );
                           })),
               const SizedBox(
@@ -127,6 +140,7 @@ class _HomePageState extends State<HomePage> {
                         style: const TextStyle(fontSize: 10));
                   })
             ]),
+      ),
       ),
       floatingActionButton: FloatingActionButton(
           foregroundColor: Colors.white,
