@@ -11,22 +11,36 @@ class HomePageViewModel extends ChangeNotifier {
   bool get running => hrMonitor?.isRunning ?? false;
 
   Stream<DeviceState> get stateChange =>
-      hrMonitor?.stateChange ?? Stream.empty();
+      hrMonitor?.stateChange ?? const Stream.empty();
 
-  Stream<int> get hr => hrMonitor?.heartbeat ?? Stream.empty();
+  Stream<int> get hr => hrMonitor?.heartbeat ?? const Stream.empty();
 
-  Stream<String> get temp => hrMonitor?.temperature ?? Stream.empty();
+  Stream<String> get temp => hrMonitor?.temperature ?? const Stream.empty();
 
-  Stream<List<String>> get ecg => hrMonitor?.ecg ?? Stream.empty();
+  Stream<List<dynamic>> get ecg => hrMonitor?.ecg ?? const Stream.empty();
 
-  void startTemp() {
+  void start() {
     hrMonitor?.startTemp();
+
+    hrMonitor?.startHR();
+
+    hrMonitor?.startECG();
+
+    hrMonitor?.state = DeviceState.sampling;
+
+    Storage().init();
+    Storage().setDeviceAndStartUpload(hrMonitor!);
+
     notifyListeners();
   }
 
-  void startECGHR() {
-    hrMonitor?.startHR();
-    hrMonitor?.startECG();
+  void stop() {
+    //hrMonitor?.disconnect();
+    hrMonitor?.stopTemp();
+    hrMonitor?.stopHR();
+    hrMonitor?.stopECG();
+
+    hrMonitor?.state = DeviceState.disconnected;
     notifyListeners();
   }
 }

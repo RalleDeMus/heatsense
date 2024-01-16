@@ -12,20 +12,20 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: <Widget>[
-            const Icon(
+            Icon(
               Icons.person,
               size: 130,
             ),
-            const Text(
+            Text(
               'Username',
               style: optionStyle,
             ),
-            const SizedBox(
+            SizedBox(
               height: 30,
             ),
             Switch(value: true, onChanged: null),
@@ -34,7 +34,7 @@ class _ProfilePageState extends State<ProfilePage> {
               value: true,
               onChanged: null,
             ),
-            const SizedBox(
+            SizedBox(
               height: 30,
             ),
             /*StreamBuilder<DeviceState>(
