@@ -27,7 +27,7 @@ abstract class BLESensor {
   Stream<String> get temperature;
 
   /// The stream of temperature measures from this HR monitor.
-  Stream<List<String>> get ecg;
+  Stream<List<dynamic>> get ecg;
 
   /// Has this monitor been started via the [start] command?
   bool get isRunning;
@@ -48,7 +48,7 @@ abstract class BLESensor {
 }
 
 abstract interface class DeviceController {
-  UnmodifiableListView<MovesenseHRMonitor> get devices;
+  List<MovesenseHRMonitor> get devices;
 
   bool get isScanning;
 

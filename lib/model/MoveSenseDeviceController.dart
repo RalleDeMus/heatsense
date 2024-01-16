@@ -11,10 +11,7 @@ class MoveSenseDeviceController extends ChangeNotifier implements DeviceControll
   String? _serial;
   bool _isScanning = false;
 
-  final Set<MovesenseHRMonitor> _devices = {};
-  final _devicesController = StreamController<MovesenseHRMonitor>.broadcast();
-
-  Stream<MovesenseHRMonitor> get devicestream => _devicesController.stream;
+  final List<MovesenseHRMonitor> _devices = [];
 
   /// The device that the user has selected to connect to. Null if not yet selected.
   MovesenseHRMonitor? connectedDevice;
@@ -49,8 +46,7 @@ class MoveSenseDeviceController extends ChangeNotifier implements DeviceControll
   Stream<DeviceState> get stateChange => _stateChangeController.stream;
   */
   @override
-  UnmodifiableListView<MovesenseHRMonitor> get devices =>
-      UnmodifiableListView(_devices);
+  List<MovesenseHRMonitor> get devices => _devices;
 
   //asks for permission to use bluetooth
   Future<bool> get hasPermissions async =>
