@@ -13,53 +13,45 @@ class _EventPageState extends State<EventPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          ElevatedButton(
-            onPressed: () {
-              TestHSDetector().start();
-            },
-            child: Text('start'),
-          ),
-          /* Center(child: _buildDeviceList(widget.model.events)), */
-        ],
+      body: Center(
+        child: Column(
+          children: [
+            ListenableBuilder(
+              listenable: TimerHSDetector(),
+              builder: (BuildContext context, Widget? child) =>
+                  _buildDeviceList(TimerHSDetector().list.events),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          setState(() {});
+          TimerHSDetector().start();
         },
       ),
     );
   }
 
-/*   Widget _buildDeviceList(List<HSEvent> events) {
+  Widget _buildDeviceList(List<HSEvent> events) {
     return Expanded(
         child: ListView.builder(
-            itemCount: 1/* TimerHSDetector().list.length */,
+            itemCount: TimerHSDetector().list.events.length,
             itemBuilder: (BuildContext context, int index) =>
                 _buildDeviceItem(context, index)));
   }
 
   Widget _buildDeviceItem(BuildContext context, int index) {
     return Card(
-        clipBehavior: Clip.hardEdge,
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              ListTile(
-                title: Text('Event ${TimerHSDetector().list[index].eventId}'),
-                subtitle: Text('${TimerHSDetector().list[index].timestamp}'),
-                //trailing: Text(devicecontrol.devices[index].connectionStatus.statusName),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(child: const Text('Edit Event'), onPressed: () {}),
-                ],
-              )
-            ]));
-  }*/
+      child: ListTile(
+        title: Text('Event ${TimerHSDetector().list.events[index].eventId}'),
+        subtitle: Text('${TimerHSDetector().list.events[index].timestamp}'),
+        onTap: () {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => SecondRoute()));
+        },
+      ),
+    );
+  }
 }
 
 class SecondRoute extends StatefulWidget {

@@ -25,7 +25,6 @@ part 'model/storage.dart';
 
 part 'viewmodel/eventviewmodel.dart';
 part 'viewmodel/app_view_model.dart';
-part 'viewmodel/scanpageviewmodel.dart';
 part 'viewmodel/homeviewmodel.dart';
 
 part 'view/heatsense_app.dart';

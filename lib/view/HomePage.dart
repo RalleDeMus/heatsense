@@ -116,16 +116,18 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) => ScanPage()));
-
                   },
                   child: const Text('Scan for devices')),
               const SizedBox(height: 10),
-              StreamBuilder<DeviceState>(
-                  stream: widget.model.stateChange,
-                  builder: (context, snapshot) {
-                    return Text('Device is currently: ${snapshot.data}',
-                        style: const TextStyle(fontSize: 10));
-                  })
+              ListenableBuilder(
+                  listenable: widget.model,
+                  builder: (BuildContext context, child) =>
+                      StreamBuilder<DeviceState>(
+                          stream: widget.model.stateChange,
+                          builder: (context, snapshot) {
+                            return Text('Device is currently: ${snapshot.data}',
+                                style: const TextStyle(fontSize: 10));
+                          })),
             ]),
       ),
       floatingActionButton: FloatingActionButton(
