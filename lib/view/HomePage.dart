@@ -117,7 +117,7 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) => ScanPage()));
                     widget.model.startTemp();
-                  },
+                  },                  
                   child: const Text('Scan for devices')),
               const SizedBox(height: 10),
               StreamBuilder<DeviceState>(

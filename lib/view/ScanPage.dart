@@ -54,9 +54,7 @@ class _ScanPageState extends State<ScanPage> {
       child: ListTile(
         title: Text(MoveSenseDeviceController().devices[index].name!),
         subtitle: Text(MoveSenseDeviceController().devices[index].address!),
-        //trailing: Text(devicecontrol.devices[index].connectionStatus.statusName),
         onTap: () {
-          //MoveSenseDeviceController().setConnectedDeviceByIndex(index);
           MoveSenseDeviceController().setConnectedDeviceAndConnect(
               MoveSenseDeviceController().devices[index]);
           Navigator.pop(context);
