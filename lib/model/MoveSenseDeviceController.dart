@@ -1,7 +1,7 @@
 part of heatsense;
 
 // Singleton devicecontroller for handling the scan for devices
-class MoveSenseDeviceController implements DeviceController {
+class MoveSenseDeviceController extends ChangeNotifier implements DeviceController {
 // make class singleton
   static final MoveSenseDeviceController _instance =
       MoveSenseDeviceController._();
@@ -85,6 +85,7 @@ class MoveSenseDeviceController implements DeviceController {
         if (!devicesadd.contains(device.address)) {
           _devices.add(device);
           devicesadd.add(device.address);
+          notifyListeners();
         }
       });
     } on Error {

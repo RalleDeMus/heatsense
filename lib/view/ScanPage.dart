@@ -1,8 +1,7 @@
 part of heatsense;
 
 class ScanPage extends StatefulWidget {
-  /*  final ScanPageViewModel model; */
-  const ScanPage({/* required this.model, */ super.key});
+  const ScanPage({super.key});
 
   @override
   State<ScanPage> createState() => _ScanPageState();
@@ -14,9 +13,6 @@ class _ScanPageState extends State<ScanPage> {
   void initState() {
     super.initState();
     MoveSenseDeviceController().scan();
-    Timer(const Duration(seconds: 5), () {
-      reload();
-    });
   }
 
   void reload() {
@@ -33,19 +29,16 @@ class _ScanPageState extends State<ScanPage> {
       body: Center(
         child: Column(
           children: [
-            /* ElevatedButton(
-                onPressed: () {
-                  MoveSenseDeviceController().scan();
-                  Timer(const Duration(seconds: 5), () {
-                    reload();
-                  });
-                },
-                child:  Text('Start Scan')),*/
-            _buildDeviceList(MoveSenseDeviceController().devices),
+             ListenableBuilder(
+              listenable: MoveSenseDeviceController(), 
+              builder: (BuildContext context, Widget? child) =>
+            _buildDeviceList(MoveSenseDeviceController().devices), 
+            ),
           ],
         ),
       ),
     );
+
   }
 
   Widget _buildDeviceList(List<MovesenseHRMonitor> deviceList) {

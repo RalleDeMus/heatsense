@@ -4,10 +4,6 @@ class HomePageViewModel extends ChangeNotifier {
   MovesenseHRMonitor? get hrMonitor =>
       MoveSenseDeviceController().connectedDevice;
 
-  HomePageViewModel();
-
-  //late ScanPageViewModel scanpage;
-
   bool get running => hrMonitor?.isRunning ?? false;
 
   Stream<DeviceState> get stateChange =>
