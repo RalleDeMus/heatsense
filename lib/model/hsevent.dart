@@ -14,7 +14,7 @@ class HSEvent {
 
   List<int> temperature;
 
-  List<List<int>> ecgsignal;
+  List<List<dynamic>> ecgsignal;
 
   HSEvent(
     this.heartrate,
@@ -29,4 +29,8 @@ class HSEvent {
 
 class HSEventList {
   List<HSEvent> events = [];
+
+  void add(HSEvent event) {
+    events.add(event);
+  }
 }

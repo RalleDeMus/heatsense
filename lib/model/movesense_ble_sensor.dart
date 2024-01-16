@@ -8,7 +8,7 @@ abstract class MoveSenseBLESensor implements BLESensor {
   // The follow code controls the state management and stream of state changes.
   final _hrController = StreamController<int>.broadcast();
   final _tempController = StreamController<String>.broadcast();
-  final _ecgController = StreamController<List<String>>.broadcast();
+  final _ecgController = StreamController<List<dynamic>>.broadcast();
 
   @override
   Stream<int> get heartbeat => _hrController.stream;
@@ -17,7 +17,7 @@ abstract class MoveSenseBLESensor implements BLESensor {
   Stream<String> get temperature => _tempController.stream;
 
   @override
-  Stream<List<String>> get ecg => _ecgController.stream;
+  Stream<List<dynamic>> get ecg => _ecgController.stream;
 
   @override
   bool get isRunning => state == DeviceState.sampling;
@@ -110,15 +110,14 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
   /// Method for listening to heartrate data. The data is fed into a stream that can be listened to.
   @override
   void startHR() {
-    if (state == DeviceState.connected && _serial != null) {
+    if (/* state == DeviceState.connected && */ _serial != null) {
       _hrSubscription = MdsAsync.subscribe(
               Mds.createSubscriptionUri(_serial!, "/Meas/HR"), "{}")
           .listen((event) {
-        print('>> $event');
         num hr = event["Body"]["average"];
+        print('>> $hr');
         _hrController.add(hr.toInt());
       });
-      state = DeviceState.sampling;
     }
   }
 
@@ -126,7 +125,7 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
   @override
   void startTemp() {
     Timer.periodic(const Duration(seconds: 2), (timer) {
-      if (state == DeviceState.connected && _serial != null) {
+      if (/* state == DeviceState.connected && */ _serial != null) {
         MdsAsync.get(Mds.createRequestUri(_serial!, "/Meas/Temp"), "{}")
             .then((value) {
           double kelvin = value["Measurement"];
@@ -142,15 +141,14 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
   /// Method for listening to ECG data. The data is fed into a stream that can be listened to.
   @override
   void startECG() {
-    if (state == DeviceState.connected && _serial != null) {
+    if (/* state == DeviceState.connected && */ _serial != null) {
       _ecgSubscription = MdsAsync.subscribe(
               Mds.createSubscriptionUri(_serial!, "/Meas/ECG/125"), "{}")
           .listen((event) {
         print('>> $event');
-        List<String> ecg = event["Body"]["Samples"];
+        List<dynamic> ecg = event["Body"]["Samples"];
         _ecgController.add(ecg);
       });
-      state = DeviceState.sampling;
     }
   }
 

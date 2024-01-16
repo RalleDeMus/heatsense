@@ -13,33 +13,53 @@ class _EventPageState extends State<EventPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: ListView(children: [
-        Card(
-          clipBehavior: Clip.hardEdge,
-          elevation: 0,
-          child: Column(
+      body: Column(
+        children: [
+          ElevatedButton(
+            onPressed: () {
+              TestHSDetector().start();
+            },
+            child: Text('start'),
+          ),
+          /* Center(child: _buildDeviceList(widget.model.events)), */
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {});
+        },
+      ),
+    );
+  }
+
+/*   Widget _buildDeviceList(List<HSEvent> events) {
+    return Expanded(
+        child: ListView.builder(
+            itemCount: 1/* TimerHSDetector().list.length */,
+            itemBuilder: (BuildContext context, int index) =>
+                _buildDeviceItem(context, index)));
+  }
+
+  Widget _buildDeviceItem(BuildContext context, int index) {
+    return Card(
+        clipBehavior: Clip.hardEdge,
+        child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              const ListTile(
-                title: Text('Event 1'),
-                subtitle: Text('08-01-2024'),
+              ListTile(
+                title: Text('Event ${TimerHSDetector().list[index].eventId}'),
+                subtitle: Text('${TimerHSDetector().list[index].timestamp}'),
+                //trailing: Text(devicecontrol.devices[index].connectionStatus.statusName),
               ),
-              Row(mainAxisAlignment: MainAxisAlignment.end, children: <Widget>[
-                TextButton(
-                  child: const Text('Edit Event'),
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => SecondRoute()));
-                  },
-                ),
-              ]),
-            ],
-          ),
-        ),
-      ]),
-    );
-  }
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(child: const Text('Edit Event'), onPressed: () {}),
+                ],
+              )
+            ]));
+  }*/
 }
 
 class SecondRoute extends StatefulWidget {

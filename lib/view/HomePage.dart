@@ -97,7 +97,7 @@ class _HomePageState extends State<HomePage> {
               ListenableBuilder(
                   listenable: widget.model,
                   builder: (BuildContext context, child) =>
-                      StreamBuilder<List<String>>(
+                      StreamBuilder<List<dynamic>>(
                           stream: widget.model.ecg,
                           builder: (context, snapshot) {
                             var displayText = 'ECG Data: -- ';
@@ -116,7 +116,6 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) => ScanPage()));
-                    widget.model.startTemp();
                   },
                   child: const Text('Scan for devices')),
               const SizedBox(height: 10),
@@ -132,7 +131,11 @@ class _HomePageState extends State<HomePage> {
           foregroundColor: Colors.white,
           backgroundColor: Colors.blue,
           onPressed: () {
-            widget.model.startECGHR();
+            if (widget.model.running) {
+              widget.model.stop();
+            } else {
+              widget.model.start();
+            }
           },
           child: StreamBuilder<DeviceState>(
             stream: widget.model.stateChange,

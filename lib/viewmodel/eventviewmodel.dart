@@ -16,6 +16,8 @@ class HSEventViewModel extends ChangeNotifier {
 }
 
 class EventPageViewModel {
-  HSEventList events;
-  EventPageViewModel(this.events);
+  HSEventList eventList;
+  EventPageViewModel(this.eventList);
+
+  //Stream<HSEvent> get streamOfEvents => TimerHSDetector()
 }
