@@ -116,6 +116,7 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) => ScanPage()));
+
                   },
                   child: const Text('Scan for devices')),
               const SizedBox(height: 10),
