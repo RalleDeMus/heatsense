@@ -1,5 +1,6 @@
 part of heatsense;
 
+/// The page where the user can scan for nearby MoveSense devices.
 class ScanPage extends StatefulWidget {
   const ScanPage({super.key});
 

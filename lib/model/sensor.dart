@@ -1,5 +1,6 @@
 part of heatsense;
 
+/// States that a given device can be in.
 enum DeviceState {
   unknown,
   initialized,
@@ -10,6 +11,7 @@ enum DeviceState {
   error,
 }
 
+/// The interface for a bluetooth ECG sensor.
 abstract class BLESensor {
   /// The identifier of this monitor.
   String? get identifier;
@@ -32,31 +34,21 @@ abstract class BLESensor {
   /// Has this monitor been started via the [start] command?
   bool get isRunning;
 
-  /// Start different data collection.
+  /// Start heartrate data collection.
   void startHR();
 
+  /// Start temperature data collection.
   void startTemp();
 
+  /// Start ECG data collection.
   void startECG();
 
-  /// Stop different data collection.
+  /// Stop heartrate data collection.
   void stopHR();
 
+  /// Stop temperature data collection.
   void stopTemp();
 
+  /// Stop ECG data collection.
   void stopECG();
-}
-
-abstract interface class DeviceController {
-  List<MovesenseHRMonitor> get devices;
-
-  bool get isScanning;
-
-  void scan();
-
-  //DeviceState get state;
-
-  //Stream<DeviceState> get stateChange;
-
-  //String get connectedDeviceId;
 }

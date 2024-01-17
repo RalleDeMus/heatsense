@@ -1,7 +1,6 @@
 part of heatsense;
 
-//MovesenseHRMonitor monitor = MovesenseHRMonitor("");
-
+/// The homepage where current data can be viewed and the scan page can be accessed.
 class HomePage extends StatefulWidget {
   final HomePageViewModel model;
   const HomePage({required this.model, super.key});
@@ -15,19 +14,6 @@ class _HomePageState extends State<HomePage> {
   static const SizedBox spacer = SizedBox(
     width: 10,
   );
-  //0C:8C:DC:3F:B2:CD
-
-  /*  Future<void> _returnwithconnection(BuildContext context) async {
-    final deviceAddress = await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => ScanPage()));
-    setState(() {});
-
-    monitor = MovesenseHRMonitor(deviceAddress);
-    monitor.connect(monitor);
-    Timer(const Duration(seconds: 5), () {});
-
-    //monitor.startTemp();
-  } */
 
   @override
   Widget build(BuildContext context) {
@@ -165,8 +151,10 @@ class _HomePageState extends State<HomePage> {
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.teal.shade300),
                 onPressed: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => ScanPage()));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const ScanPage()));
                 },
                 child: const Text('Scan for devices'),
               ),
@@ -188,7 +176,7 @@ class _HomePageState extends State<HomePage> {
                                 ],
                               );
                             } else {
-                              return Text(
+                              return const Text(
                                 'Status: Not yet connected',
                                 style: TextStyle(fontSize: 20),
                               );
@@ -208,7 +196,7 @@ class _HomePageState extends State<HomePage> {
               widget.model.start();
             }
           },
-          child: Icon(Icons.play_arrow)),
+          child: const Icon(Icons.play_arrow)),
     );
   }
 

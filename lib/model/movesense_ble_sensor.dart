@@ -5,9 +5,13 @@ abstract class MoveSenseBLESensor implements BLESensor {
   StreamSubscription<dynamic>? _tempSubscription;
   StreamSubscription<dynamic>? _ecgSubscription;
 
-  // The follow code controls the state management and stream of state changes.
+  /// Controller of the heartrate data.
   final _hrController = StreamController<int>.broadcast();
+
+  /// Controller of the temperature data.
   final _tempController = StreamController<double>.broadcast();
+
+  /// Controller of the temperature data.
   final _ecgController = StreamController<List<dynamic>>.broadcast();
 
   final _stateChangeController = StreamController<DeviceState>.broadcast();

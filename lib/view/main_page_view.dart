@@ -1,34 +1,27 @@
 part of heatsense;
 
-class BottomNavigationBarHeatSense extends StatefulWidget {
-  const BottomNavigationBarHeatSense({super.key, required this.model});
+/// The main page of the app, which contains the bottom navigationbar.
+class MainPage extends StatefulWidget {
+  const MainPage({super.key, required this.model});
   final AppViewModel model;
 
   @override
-  State<BottomNavigationBarHeatSense> createState() =>
-      _BottomNavigationBarHeatSenseState();
+  State<MainPage> createState() => _MainPageState();
 }
 
-class _BottomNavigationBarHeatSenseState
-    extends State<BottomNavigationBarHeatSense> {
+class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
   final List<Widget> _widgetOptions = [];
 
-  _BottomNavigationBarHeatSenseState();
+  _MainPageState();
 
   @override
   void initState() {
     super.initState();
     _widgetOptions.add(HomePage(model: widget.model.homeModel));
     _widgetOptions.add(EventPage(model: widget.model.eventList));
-    _widgetOptions.add(ProfilePage());
+    _widgetOptions.add(const ProfilePage());
   }
-
-/*   final List<Widget> _widgetOptions = [
-    const HomePage(),
-    EventPage(model: widget.model.eventList),
-    const ProfilePage(),
-  ]; */
 
   void _onItemTapped(int index) {
     setState(() {
@@ -71,28 +64,3 @@ class _BottomNavigationBarHeatSenseState
     );
   }
 }
-
-
-
-/*
-class ScanSecondRoute extends StatefulWidget {
-  const ScanSecondRoute({super.key});
-  @override
-  State<ScanSecondRoute> createState() => _ScanSecondRouteState();
-}
-
-class _ScanSecondRouteState extends State<ScanSecondRoute> {
-  Widget _buildDeviceItem(BuildContext context, int index) {
-    return Card(
-      child: ListTile(
-        title: Text(monitor.devices[index].name!),
-        subtitle: Text(monitor.devices[index].address!),
-        onTap: () => {},
-      ),
-    );
-  }
-
-  
-*/
-
-

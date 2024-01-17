@@ -1,5 +1,7 @@
 part of heatsense;
 
+/// The page where event history can be seen and accessed by the user.
+// TODO - make eventpage update when an event is detected
 class EventPage extends StatefulWidget {
   final EventPageViewModel model;
 
@@ -48,8 +50,8 @@ class _EventPageState extends State<EventPage> {
         title: Text('Event ${TimerHSDetector().list.events[index].eventId}'),
         subtitle: Text('${TimerHSDetector().list.events[index].timestamp}'),
         onTap: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => SecondRoute()));
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => const SecondRoute()));
         },
       ),
     );
@@ -84,18 +86,18 @@ class _SecondRouteState extends State<SecondRoute> {
       ),
       body: Center(
         child: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-          SizedBox(
+          const SizedBox(
             height: 15,
           ),
-          Text(
+          const Text(
             '12. October 2023',
             style: TextStyle(fontSize: 20),
           ),
-          Text('08:31 AM', style: TextStyle(fontSize: 20)),
-          SizedBox(
+          const Text('08:31 AM', style: TextStyle(fontSize: 20)),
+          const SizedBox(
             height: 50,
           ),
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             Icon(
               Icons.favorite,
               size: 64,
@@ -106,14 +108,14 @@ class _SecondRouteState extends State<SecondRoute> {
               style: TextStyle(fontSize: 40),
             )
           ]),
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
             Icon(
               Icons.device_thermostat,
               size: 64,
             ),
             Text('40 C°', style: TextStyle(fontSize: 40))
           ]),
-          SizedBox(
+          const SizedBox(
             height: 90,
           ),
           Column(

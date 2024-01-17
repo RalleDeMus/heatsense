@@ -1,10 +1,9 @@
 part of heatsense;
 
+/// View Model of the home page
 class HomePageViewModel extends ChangeNotifier {
   MovesenseHRMonitor? get hrMonitor =>
       MoveSenseDeviceController().connectedDevice;
-
-  bool isStarted = false;
 
   bool get running => hrMonitor?.isRunning ?? false;
 
@@ -26,8 +25,6 @@ class HomePageViewModel extends ChangeNotifier {
 
   /// Starts showing the data on the homepage and initializes storage.
   void start() {
-    //if (hrMonitor?.state == DeviceState.connected ||
-    //  hrMonitor?.state == DeviceState.sampling) {
     if (hrMonitor?.state == DeviceState.connected) {
       hrMonitor?.startTemp();
 
@@ -39,8 +36,6 @@ class HomePageViewModel extends ChangeNotifier {
 
       Storage().init();
       Storage().setDeviceAndStartUpload(hrMonitor!);
-
-      isStarted = true;
     } else if (hrMonitor?.state == DeviceState.sampling) {
       hrMonitor?.resumeTemp();
 
@@ -49,7 +44,6 @@ class HomePageViewModel extends ChangeNotifier {
       hrMonitor?.resumeECG();
     }
     notifyListeners();
-    // }
   }
 
   /// Pauses the data shown on the homepage.

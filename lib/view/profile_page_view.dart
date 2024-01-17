@@ -1,5 +1,7 @@
 part of heatsense;
 
+/// The profile page of the app, where the user can see profile info, and change preferences.
+// TODO - implement preference selection.
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 

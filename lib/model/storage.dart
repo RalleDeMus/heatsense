@@ -122,6 +122,7 @@ class Storage {
     return result;
   }
 
+  /// Deletes the database.
   void deleteDatabase() async {
     database.close();
     var dir = await getApplicationDocumentsDirectory();
@@ -129,6 +130,7 @@ class Storage {
     await databaseFactoryIo.deleteDatabase(path);
   }
 
+  /// A method for extracting data from the database and saving it as a JSON file on the phone.
   Future<void> dump() async {
     print('Starting to dump database');
     int count = await this.count();

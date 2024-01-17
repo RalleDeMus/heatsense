@@ -1,5 +1,15 @@
 part of heatsense;
 
+/// An interface for a device controller, which manages devices.
+abstract interface class DeviceController {
+  /// A list of devices.
+  List<MovesenseHRMonitor> get devices;
+
+  bool get isScanning;
+
+  void scan();
+}
+
 // Singleton devicecontroller for handling the scan for devices
 class MoveSenseDeviceController extends ChangeNotifier
     implements DeviceController {
