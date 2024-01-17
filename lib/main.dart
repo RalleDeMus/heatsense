@@ -1,11 +1,9 @@
 library heatsense;
 
-import 'dart:ffi';
-import 'dart:math';
-
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'dart:collection';
+import 'package:sembast/utils/sembast_import_export.dart';
 import 'dart:async';
 import 'package:mdsflutter/Mds.dart';
 import 'package:sembast/sembast.dart';
