@@ -10,6 +10,8 @@ abstract class MoveSenseBLESensor implements BLESensor {
   final _tempController = StreamController<String>.broadcast();
   final _ecgController = StreamController<List<dynamic>>.broadcast();
 
+final _stateChangeController = StreamController<DeviceState>.broadcast();
+
   @override
   Stream<int> get heartbeat => _hrController.stream;
 
@@ -18,6 +20,9 @@ abstract class MoveSenseBLESensor implements BLESensor {
 
   @override
   Stream<List<dynamic>> get ecg => _ecgController.stream;
+
+@override
+  Stream<DeviceState> get stateChange => _stateChangeController.stream;
 
   @override
   bool get isRunning => state == DeviceState.sampling;
@@ -77,18 +82,15 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
   /// The serial number of the device.
   String? get name => _name;
 
-  @override
-  Stream<DeviceState> get stateChange => _stateChangeController.stream;
-
   MovesenseHRMonitor(this._address, [this._name]);
 
-  final StreamController<DeviceState> _stateChangeController =
-      StreamController.broadcast();
+  
   DeviceState _state = DeviceState.unknown;
 
   set state(DeviceState state) {
     _state = state;
     _stateChangeController.add(state);
+    print('%% state change: $state');
   }
 
   /// Start connecting to the Movesense device with the specified address.

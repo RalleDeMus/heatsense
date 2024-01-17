@@ -53,6 +53,9 @@ class _ScanPageState extends State<ScanPage> {
           MoveSenseDeviceController().setConnectedDeviceAndConnect(
               MoveSenseDeviceController().devices[index]);
           Navigator.pop(context);
+          setState(() {
+            
+          });
         },
       ),
     );
