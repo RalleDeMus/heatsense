@@ -76,9 +76,3 @@ class TimerHSDetector extends ChangeNotifier implements HSDetector {
     [1, 2, 3, 4, 5]
   ]);
 }
-
-class TestHSDetector extends ChangeNotifier {
-  static final TestHSDetector _instance = TestHSDetector._();
-  TestHSDetector._();
-  factory TestHSDetector() => _instance;
-}

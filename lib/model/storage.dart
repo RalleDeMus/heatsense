@@ -6,10 +6,14 @@ class Storage {
   Storage._();
   factory Storage() => _instance;
 
+  static const String DB_NAME = 'HeatSense_data';
   MovesenseHRMonitor? sensor;
   StoreRef? store;
   var database;
   var time = 0;
+
+  /// The path to the phone's application folder.
+  Directory? dir;
 
   /// Initialize the storage by opening the database and listening to HR events.
   Future<void> init() async {
@@ -17,23 +21,28 @@ class Storage {
 
     // Get the application documents directory
     var dir = await getApplicationDocumentsDirectory();
-    // Make sure it exists
-    await dir.create(recursive: true);
-    // Build the database path
 
-    var path = join(dir.path, 'HeatSense_data.db');
+    if (dir == null) {
+      print('WARNING - could not create database. Data is not saved....');
+    } else {
+      // Make sure it exists
+      await dir.create(recursive: true);
+      // Build the database path
 
-    // Delete the existing database file if it exists
-    var dbFile = File(path);
-    if (await dbFile.exists()) {
-      await dbFile.delete();
+      var path = join(dir.path, '${DB_NAME}.db');
+
+      // Delete the existing database file if it exists
+      var dbFile = File(path);
+      if (await dbFile.exists()) {
+        await dbFile.delete();
+      }
+      // Open the database
+      database = await databaseFactoryIo.openDatabase(path);
+
+      // Create a store with the name of the identifier of the monitor and which
+      // can hold maps indexed by an int.
+      store = intMapStoreFactory.store(sensor?.address);
     }
-    // Open the database
-    database = await databaseFactoryIo.openDatabase(path);
-
-    // Create a store with the name of the identifier of the monitor and which
-    // can hold maps indexed by an int.
-    store = intMapStoreFactory.store(sensor?.address);
   }
 
   // Create a JSON object with the timestamp and data:
@@ -99,7 +108,6 @@ class Storage {
   }
 
   /// Get the list of json objects which has not yet been uploaded.
-  // TODO - implement this getJsonToUpload() method.
   Future<List<Map<String, dynamic>>> getJsonToUpload() async {
     var finder = Finder(
         filter: Filter.greaterThan('timestamp', time),
@@ -119,6 +127,23 @@ class Storage {
     var dir = await getApplicationDocumentsDirectory();
     var path = join(dir.path, 'HeatSense_data.db');
     await databaseFactoryIo.deleteDatabase(path);
+  }
+
+  Future<void> dump() async {
+    print('Starting to dump database');
+    int count = await this.count();
+
+    // Export db, but only this store.
+    Map<String, Object?> data =
+        await exportDatabase(database, storeNames: [sensor!.address]);
+
+    // Convert the JSON map to a string representation.
+    String dataAsJson = json.encode(data);
+    // Build the file path and write the data
+    var path = join(dir!.path, '$DB_NAME.json');
+    await File(path).writeAsString(dataAsJson);
+    print("Database dumped in file '$path'. "
+        'Total $count records successfully written to file.');
   }
 }
 

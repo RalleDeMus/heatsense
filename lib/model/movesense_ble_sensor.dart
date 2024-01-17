@@ -152,5 +152,6 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
     }
   }
 
+  /// Disconnect from MoveSense Device.
   void disconnect() => Mds.disconnect(address);
 }
