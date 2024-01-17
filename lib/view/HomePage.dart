@@ -12,7 +12,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   static const TextStyle optionStyle = TextStyle(fontSize: 40);
-
+  static const TextStyle dataStyle = TextStyle(fontSize: 20); 
   //0C:8C:DC:3F:B2:CD
 
   /*  Future<void> _returnwithconnection(BuildContext context) async {
@@ -39,21 +39,30 @@ class _HomePageState extends State<HomePage> {
                   children: <Widget>[
                     Icon(
                       Icons.location_on_outlined,
-                      size: 56,
+                      size: 45,
                     ),
                     Text(
                       'Sweden',
                       style: optionStyle,
                     ),
                   ]),
-              const Text(
-                '19°',
-                style: TextStyle(fontWeight: FontWeight.w300, fontSize: 64),
-              ),
-              const Text(
-                'Feels like: 26°',
-                style: TextStyle(fontWeight: FontWeight.w300),
-              ),
+                 const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        '19°',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w300, fontSize: 25),
+                      ),
+                      Text(
+                        'Feels like: 26°',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w300, fontSize: 25),
+                      ),
+                    ]),
+                Divider(
+                  color: Colors.black,
+                ),
               const Text('No risk of heatstroke'),
               const SizedBox(
                 height: 70,
@@ -69,7 +78,7 @@ class _HomePageState extends State<HomePage> {
                       }
                       return Text(
                         displayText,
-                        style: TextStyle(fontSize: 20),
+                        style: dataStyle,
                       );
                     }),
               ),
@@ -87,7 +96,7 @@ class _HomePageState extends State<HomePage> {
                       }
                       return Text(
                         displayText,
-                        style: TextStyle(fontSize: 20),
+                        style: dataStyle,
                       );
                     }),
               ),
@@ -106,27 +115,49 @@ class _HomePageState extends State<HomePage> {
                             }
                             return Text(
                               displayText,
-                              style: TextStyle(fontSize: 20),
+                              style: dataStyle,
                             );
                           })),
               const SizedBox(
                 height: 90,
               ),
               ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => ScanPage()));
-                  },
-                  child: const Text('Scan for devices')),
+                onPressed: () {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => ScanPage()));
+                },
+                /* child: ListenableBuilder(
+                    listenable: widget.model,
+                    builder: (BuildContext context, child) =>
+                        StreamBuilder<DeviceState>(
+                            stream: widget.model.state,
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                              /*   String buttonText =
+                                    _getButtonText(snapshot.data!); */
+                                return Text('Disconnect');
+                              } else {
+                                return Text('Connect to device');
+                              }
+                            })), */
+              child: const Text('Scan for devices')),
+              
               const SizedBox(height: 10),
               ListenableBuilder(
                   listenable: widget.model,
                   builder: (BuildContext context, child) =>
                       StreamBuilder<DeviceState>(
-                          stream: widget.model.stateChange,
+                          stream: widget.model.state,
                           builder: (context, snapshot) {
-                            return Text('Device is currently: ${snapshot.data}',
-                                style: const TextStyle(fontSize: 10));
+                             if (snapshot.hasData) {
+                                String buttonText =
+                                    _getButtonText(snapshot.data!);
+                                return Text('Status: $buttonText');
+                              } else {
+                                return Text('Status: Disconnecte2d');
+                              } 
+                              //return Text('Device is currently: ${snapshot.data}',
+                              //style: const TextStyle(fontSize: 10));
                           })),
             ]),
       ),
@@ -141,11 +172,26 @@ class _HomePageState extends State<HomePage> {
             }
           },
           child: StreamBuilder<DeviceState>(
-            stream: widget.model.stateChange,
+            stream: widget.model.state,
             builder: (context, snapshot) => (widget.model.running)
                 ? const Icon(Icons.stop)
                 : const Icon(Icons.play_arrow),
           )),
     );
+  }
+
+  String _getButtonText(DeviceState state) {
+    switch (state) {
+      case DeviceState.connected:
+        return "Connected";
+      case DeviceState.connecting:
+        return "Connecting...";
+      case DeviceState.disconnected:
+        return "Disconnecte33d";
+      case DeviceState.error:
+        return "Error";
+      default:
+        return "Sampling";
+    }
   }
 }

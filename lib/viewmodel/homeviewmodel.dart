@@ -8,8 +8,10 @@ class HomePageViewModel extends ChangeNotifier {
 
   bool get running => hrMonitor?.isRunning ?? false;
 
+
   //Streams of data needed on the homepage
   Stream<DeviceState> get stateChange =>
+
       hrMonitor?.stateChange ?? const Stream.empty();
 
   Stream<int> get hr => hrMonitor?.heartbeat ?? const Stream.empty();
@@ -18,6 +20,12 @@ class HomePageViewModel extends ChangeNotifier {
 
   Stream<List<dynamic>> get ecg => hrMonitor?.ecg ?? const Stream.empty();
 
+
+HomePageViewModel() {
+  MoveSenseDeviceController().addListener(() { notifyListeners();});
+}
+
+  
   /// Starts showing the data on the homepage and initializes storage.
   void start() {
     if (hrMonitor?.state == DeviceState.connected ||
@@ -25,11 +33,13 @@ class HomePageViewModel extends ChangeNotifier {
       if (isStarted = false) {
         hrMonitor?.startTemp();
 
+
         hrMonitor?.startHR();
 
         hrMonitor?.startECG();
 
         hrMonitor?.state = DeviceState.sampling;
+
 
         Storage().init();
         Storage().setDeviceAndStartUpload(hrMonitor!);

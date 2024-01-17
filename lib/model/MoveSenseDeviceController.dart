@@ -20,6 +20,7 @@ class MoveSenseDeviceController extends ChangeNotifier implements DeviceControll
 
   Future<void> setConnectedDeviceAndConnect(MovesenseHRMonitor device) async {
     connectedDevice = device;
+    notifyListeners();
     await connectedDevice?.connect();
   }
 
