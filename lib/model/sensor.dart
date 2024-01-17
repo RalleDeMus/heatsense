@@ -24,7 +24,7 @@ abstract class BLESensor {
   Stream<int> get heartbeat;
 
   /// The stream of temperature measures from this HR monitor.
-  Stream<String> get temperature;
+  Stream<double> get temperature;
 
   /// The stream of temperature measures from this HR monitor.
   Stream<List<dynamic>> get ecg;

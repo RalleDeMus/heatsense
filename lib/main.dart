@@ -16,20 +16,20 @@ part 'bLoc/hs_detector.dart';
 
 part 'model/sensor.dart';
 part 'model/movesense_ble_sensor.dart';
-part 'model/MoveSenseDeviceController.dart';
+part 'model/movesense_device_controller.dart';
 part 'model/hsevent.dart';
 part 'model/app_model.dart';
 part 'model/storage.dart';
 
-part 'viewmodel/eventviewmodel.dart';
+part 'viewmodel/event_page_view_model.dart';
 part 'viewmodel/app_view_model.dart';
-part 'viewmodel/homeviewmodel.dart';
+part 'viewmodel/home_page_view_model.dart';
 
-part 'view/heatsense_app.dart';
-part 'view/EventPage.dart';
-part 'view/HomePage.dart';
-part 'view/ProfilePage.dart';
-part 'view/ScanPage.dart';
+part 'view/main_page_view.dart';
+part 'view/event_page_view.dart';
+part 'view/home_page_view.dart';
+part 'view/profile_page_view.dart';
+part 'view/scan_page_view.dart';
 
 void main() {
   runApp(HeatSenseApp());

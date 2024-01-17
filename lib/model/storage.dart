@@ -20,16 +20,16 @@ class Storage {
     print('Initializing storage, id: ${sensor?.address}');
 
     // Get the application documents directory
-    var dir = await getApplicationDocumentsDirectory();
+    dir = await getApplicationDocumentsDirectory();
 
     if (dir == null) {
       print('WARNING - could not create database. Data is not saved....');
     } else {
       // Make sure it exists
-      await dir.create(recursive: true);
+      await dir!.create(recursive: true);
       // Build the database path
 
-      var path = join(dir.path, '${DB_NAME}.db');
+      var path = join(dir!.path, '${DB_NAME}.db');
 
       // Delete the existing database file if it exists
       var dbFile = File(path);
@@ -59,33 +59,33 @@ class Storage {
     sensor?.heartbeat.listen((int hr) {
       // Timestamp the HR reading.
       hrJson['timestamp'] = DateTime.now().millisecondsSinceEpoch;
-      hrJson['Data'] = [hrJson['hr'] = hr];
+      hrJson['hr'] = hr;
 
       // Add the json record to the database
       store?.add(database!, hrJson);
       print('>>>> $hrJson');
     });
 
-    sensor?.temperature.listen((String temp) {
+    sensor?.temperature.listen((double temp) {
       // Timestamp the temp reading.
       tempJson['timestamp'] = DateTime.now().millisecondsSinceEpoch;
-      tempJson['Data'] = [tempJson['temp'] = temp];
+      tempJson['temp'] = temp;
 
       // Add the json record to the database
       store?.add(database!, tempJson);
       print('>>>> $tempJson');
     });
 
-    sensor?.ecg.listen((echo) {
+    /* sensor?.ecg.listen((echo) {
       // Timestamp the ecg reading.
       ecgJson['timestamp'] = DateTime.now().millisecondsSinceEpoch;
-      ecgJson['Data'] = [ecgJson['ecg'] = echo];
+      ecgJson['ecg'] = echo;
 
       // Add the json record to the database
       store?.add(database!, ecgJson);
       print('>>>> $ecgJson');
     });
-
+ */
     UploadManager uploader = UploadManager(this);
     uploader.startUpload();
   }

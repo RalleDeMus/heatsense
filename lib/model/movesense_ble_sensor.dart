@@ -7,21 +7,21 @@ abstract class MoveSenseBLESensor implements BLESensor {
 
   // The follow code controls the state management and stream of state changes.
   final _hrController = StreamController<int>.broadcast();
-  final _tempController = StreamController<String>.broadcast();
+  final _tempController = StreamController<double>.broadcast();
   final _ecgController = StreamController<List<dynamic>>.broadcast();
 
-final _stateChangeController = StreamController<DeviceState>.broadcast();
+  final _stateChangeController = StreamController<DeviceState>.broadcast();
 
   @override
   Stream<int> get heartbeat => _hrController.stream;
 
   @override
-  Stream<String> get temperature => _tempController.stream;
+  Stream<double> get temperature => _tempController.stream;
 
   @override
   Stream<List<dynamic>> get ecg => _ecgController.stream;
 
-@override
+  @override
   Stream<DeviceState> get stateChange => _stateChangeController.stream;
 
   @override
@@ -64,6 +64,7 @@ final _stateChangeController = StreamController<DeviceState>.broadcast();
   }
 }
 
+/// A class that contains all the attributes of the MoveSense device.
 class MovesenseHRMonitor extends MoveSenseBLESensor {
   String? _address, _name, _serial;
 
@@ -84,16 +85,16 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
 
   MovesenseHRMonitor(this._address, [this._name]);
 
-  
   DeviceState _state = DeviceState.unknown;
 
+  /// Sets the updated state and adds the new state to the controller.
   set state(DeviceState state) {
     _state = state;
     _stateChangeController.add(state);
-    print('%% state change: $state');
+    //print('%% state change: $state');
   }
 
-  /// Start connecting to the Movesense device with the specified address.
+  /// Start connecting to the MoveSense device with the specified address.
   Future<void> connect() async {
     state = DeviceState.initialized;
 
@@ -117,7 +118,7 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
               Mds.createSubscriptionUri(_serial!, "/Meas/HR"), "{}")
           .listen((event) {
         num hr = event["Body"]["average"];
-        print('>> $hr');
+        //print('>> $hr');
         _hrController.add(hr.toInt());
       });
     }
@@ -127,14 +128,13 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
   @override
   void startTemp() {
     Timer.periodic(const Duration(seconds: 2), (timer) {
-      if (/* state == DeviceState.connected && */ _serial != null) {
+      if (_serial != null) {
         MdsAsync.get(Mds.createRequestUri(_serial!, "/Meas/Temp"), "{}")
             .then((value) {
           double kelvin = value["Measurement"];
-          double temperatureVal = kelvin - 273.15;
-          String temp = temperatureVal.toStringAsPrecision(3);
+          double temp = double.parse((kelvin - 273.15).toStringAsFixed(1));
           _tempController.add(temp);
-          print(">>> $temp");
+          //print(">>> $temp");
         });
       }
     });
@@ -143,11 +143,11 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
   /// Method for listening to ECG data. The data is fed into a stream that can be listened to.
   @override
   void startECG() {
-    if (/* state == DeviceState.connected && */ _serial != null) {
+    if (_serial != null) {
       _ecgSubscription = MdsAsync.subscribe(
               Mds.createSubscriptionUri(_serial!, "/Meas/ECG/125"), "{}")
           .listen((event) {
-        print('>> $event');
+        //print('>> $event');
         List<dynamic> ecg = event["Body"]["Samples"];
         _ecgController.add(ecg);
       });
