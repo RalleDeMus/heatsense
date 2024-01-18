@@ -1,7 +1,9 @@
 part of heatsense;
 
+/// The heatstroke event class that holds all the information about a specific event.
 class HSEvent {
   static int counter = 1;
+
   late DateTime timestamp;
 
   Duration timespan;
@@ -12,7 +14,7 @@ class HSEvent {
 
   List<int> heartrate;
 
-  List<int> temperature;
+  List<double> temperature;
 
   List<List<dynamic>> ecgsignal;
 
@@ -27,6 +29,7 @@ class HSEvent {
   }
 }
 
+/// Holds a list of heatstroke events.
 class HSEventList {
   List<HSEvent> events = [];
 }

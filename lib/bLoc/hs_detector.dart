@@ -1,12 +1,15 @@
 part of heatsense;
 
+/// An interface for a heatstroke detector.
 abstract interface class HSDetector {
-  //Stream<HSEvent> get detectedEvents;
+  HSEventList get list;
 
   void start();
+
   void stop();
 }
 
+/// The detector that detects if a heatstroke has occured.
 class TimerHSDetector extends ChangeNotifier implements HSDetector {
   static final TimerHSDetector _instance = TimerHSDetector._();
   TimerHSDetector._();
@@ -14,23 +17,18 @@ class TimerHSDetector extends ChangeNotifier implements HSDetector {
 
   bool e = false;
 
+  @override
   HSEventList list = HSEventList();
 
-  /* StreamSubscription<dynamic>? _eventSubscription;
-
-  final _eventController = StreamController<HSEvent>.broadcast();
-
-  @override
-  Stream<HSEvent> get detectedEvents => _eventController.stream;
-
-  
-  */
+  /// Adds a HSEvent to the list of events.
   void addHSEvent(HSEvent event) {
     list.events.add(event);
     notifyListeners();
   }
 
   @override
+  // TODO - implement the algorithm to check for a heatstroke.
+  /// Starts the heatstroke detector.
   void start() {
     if (!e) {
       addHSEvent(event1);
@@ -39,18 +37,14 @@ class TimerHSDetector extends ChangeNotifier implements HSDetector {
       addHSEvent(event2);
       e = false;
     }
-
-    /*  Timer(const Duration(seconds: 10), () {
-      addHSEvent(event1);
-    });
-    Timer(const Duration(seconds: 10), () {
-      addHSEvent(event2);
-    }); */
   }
 
   @override
+  // TODO - implement the stop method for the detector.
+  /// Stops the heatstroke detector.
   void stop() {}
 
+  // a couple of dummy events.
   HSEvent event1 = HSEvent([
     80,
     90,
