@@ -16,7 +16,7 @@ We will be using the MoveSense API (mdsflutter package) to communicate with the 
 
 ## UX Design
 
-HeatSense consists of a Home Page, a Scan Page, an Event Page and a Profile Page, the Scan Page can be accessed through a button on the Home Page and the user can easily switch between the other pages by clicking on the navigationbar. 
+HeatSense consists of a Home Page, a Scan Page, an Event Page, an Edit Event Page and a Profile Page, the Scan Page can be accessed through a button on the Home Page and the Edit Event Page is accessed by clicking on an event on the Event Page. The user can easily switch between the other pages by clicking on the navigationbar. 
 
 
 <img src="images/HomePage.jpg" width ="180"> <img src="images/EventPage.jpg" width ="180"> <img src="images/ProfilePage.jpg" width ="180"> <img src="images/ScanPage.jpg" width ="180">  <img src="images/EditEvent.jpg" width ="180"> 
