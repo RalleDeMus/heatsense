@@ -53,7 +53,7 @@ class HomePageViewModel extends ChangeNotifier {
       notifyListeners();
 // print error if error occurs.
     } on Exception catch (e) {
-      //print('Start of data collection failed: $e');
+      debugPrint('Start of data collection failed: $e');
       hrMonitor?.state = DeviceState.error;
     }
   }
