@@ -76,7 +76,7 @@ class Storage {
       print('>>>> $tempJson');
     });
 
-    /* sensor?.ecg.listen((echo) {
+    sensor?.ecg.listen((echo) {
       // Timestamp the ecg reading.
       ecgJson['timestamp'] = DateTime.now().millisecondsSinceEpoch;
       ecgJson['ecg'] = echo;
@@ -85,7 +85,8 @@ class Storage {
       store?.add(database!, ecgJson);
       print('>>>> $ecgJson');
     });
- */
+
+    // Create an UploadManager
     UploadManager uploader = UploadManager(this);
     uploader.startUpload();
   }

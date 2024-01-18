@@ -1,6 +1,6 @@
 part of heatsense;
 
-/// View Model of the home page
+/// View Model of the [HomePage]
 class HomePageViewModel extends ChangeNotifier {
   MovesenseHRMonitor? get hrMonitor =>
       MoveSenseDeviceController().connectedDevice;

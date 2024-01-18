@@ -62,17 +62,26 @@ class MoveSenseDeviceController extends ChangeNotifier
   @override
 
   /// Scans for devices to connect to.
+  ///
+  /// Catches an error if scan fails and prints the error in the debugger.
   void scan() async {
     _devices.clear();
-
+    // check for permissions
     await init();
     try {
       _isScanning = true;
+
+      // create a list of addresses
       List<String> devicesadd = [];
+
+      // stop the scanning after 60 seconds.
       Timer(const Duration(seconds: 60), () => stopScan());
+
       Mds.startScan((name, address) {
         MovesenseHRMonitor device = MovesenseHRMonitor(address, name);
         print('Device found, address: $address');
+
+        // check if device has already been found
         if (!devicesadd.contains(device.address)) {
           _devices.add(device);
           devicesadd.add(device.address);
@@ -81,6 +90,7 @@ class MoveSenseDeviceController extends ChangeNotifier
       });
     } on Error {
       print('Error during scanning');
+      connectedDevice?.state = DeviceState.error;
     }
   }
 
