@@ -59,11 +59,10 @@ class MoveSenseDeviceController extends ChangeNotifier
     if (!(await hasPermissions)) await requestPermissions();
   }
 
-  @override
-
   /// Scans for devices to connect to.
   ///
   /// Catches an error if scan fails and prints the error in the debugger.
+  @override
   void scan() async {
     _devices.clear();
     // check for permissions
@@ -88,8 +87,8 @@ class MoveSenseDeviceController extends ChangeNotifier
           notifyListeners();
         }
       });
-    } on Error {
-      print('Error during scanning');
+    } catch (e) {
+      print('Error during scanning: $e');
       connectedDevice?.state = DeviceState.error;
     }
   }

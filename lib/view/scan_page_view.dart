@@ -54,8 +54,8 @@ class _ScanPageState extends State<ScanPage> {
         onTap: () {
           MoveSenseDeviceController().setConnectedDeviceAndConnect(
               MoveSenseDeviceController().devices[index]);
-          /* MoveSenseDeviceController().devices[index].state =
-              DeviceState.connecting; */
+          MoveSenseDeviceController().devices[index].state =
+              DeviceState.connecting;
           Navigator.pop(context);
         },
       ),

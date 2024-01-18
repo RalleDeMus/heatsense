@@ -6,7 +6,7 @@ class Storage {
   Storage._();
   factory Storage() => _instance;
 
-  static const String DB_NAME = 'HeatSense_data';
+  static const String dbName = 'HeatSense_data';
   MovesenseHRMonitor? sensor;
   StoreRef? store;
   var database;
@@ -29,7 +29,7 @@ class Storage {
       await dir!.create(recursive: true);
       // Build the database path
 
-      var path = join(dir!.path, '${DB_NAME}.db');
+      var path = join(dir!.path, '$dbName.db');
 
       // Delete the existing database file if it exists
       var dbFile = File(path);
@@ -63,7 +63,7 @@ class Storage {
 
       // Add the json record to the database
       store?.add(database!, hrJson);
-      print('>>>> $hrJson');
+      //print('>>>> $hrJson');
     });
 
     sensor?.temperature.listen((double temp) {
@@ -73,7 +73,7 @@ class Storage {
 
       // Add the json record to the database
       store?.add(database!, tempJson);
-      print('>>>> $tempJson');
+      //print('>>>> $tempJson');
     });
 
     sensor?.ecg.listen((echo) {
@@ -83,7 +83,7 @@ class Storage {
 
       // Add the json record to the database
       store?.add(database!, ecgJson);
-      print('>>>> $ecgJson');
+      //print('>>>> $ecgJson');
     });
 
     // Create an UploadManager
@@ -133,20 +133,28 @@ class Storage {
 
   /// A method for extracting data from the database and saving it as a JSON file on the phone.
   Future<void> dump() async {
-    print('Starting to dump database');
-    int count = await this.count();
+    debugPrint('Starting to dump database');
 
-    // Export db, but only this store.
-    Map<String, Object?> data =
-        await exportDatabase(database, storeNames: [sensor!.address]);
+    // try to dump data
+    try {
+      int count = await this.count();
 
-    // Convert the JSON map to a string representation.
-    String dataAsJson = json.encode(data);
-    // Build the file path and write the data
-    var path = join(dir!.path, '$DB_NAME.json');
-    await File(path).writeAsString(dataAsJson);
-    print("Database dumped in file '$path'. "
-        'Total $count records successfully written to file.');
+      // Export db, but only this store.
+      Map<String, Object?> data =
+          await exportDatabase(database, storeNames: [sensor!.address]);
+
+      // Convert the JSON map to a string representation.
+      String dataAsJson = json.encode(data);
+      // Build the file path and write the data
+      var path = join(dir!.path, '$dbName.json');
+      await File(path).writeAsString(dataAsJson);
+      debugPrint("Database dumped in file '$path'. "
+          'Total $count records successfully written to file.');
+
+      // catch error if dump fails
+    } on Exception catch (e) {
+      debugPrint('Database dump failed: $e');
+    }
   }
 }
 
@@ -161,13 +169,17 @@ class UploadManager {
 
   /// Start uploading every 10 minutes.
   void startUpload() {
-    uploadTimer = Timer.periodic(const Duration(minutes: 1), (timer) async {
-      var dataToUpload = await storage.getJsonToUpload();
-      print('Uploading ${dataToUpload.length} json objects...');
-      print('>>>> $dataToUpload');
-      storage.time = DateTime.now().microsecondsSinceEpoch;
-      print('>>>>> ${storage.time}');
-    });
+    try {
+      uploadTimer = Timer.periodic(const Duration(minutes: 10), (timer) async {
+        var dataToUpload = await storage.getJsonToUpload();
+        debugPrint('Uploading ${dataToUpload.length} json objects...');
+        //debugPrint('>>>> $dataToUpload');
+        storage.time = DateTime.now().microsecondsSinceEpoch;
+        //debugPrint('>>>>> ${storage.time}');
+      });
+    } on Exception catch (e) {
+      debugPrint('Upload of data failed: $e');
+    }
   }
 
   /// Stop uploading.

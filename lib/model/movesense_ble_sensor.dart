@@ -102,22 +102,30 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
   Future<void> connect() async {
     state = DeviceState.initialized;
 
-    state = DeviceState.connecting;
-    Mds.connect(
-      address,
-      (serial) {
-        _serial = serial;
-        state = DeviceState.connected;
-      },
-      () => state = DeviceState.disconnected,
-      () => state = DeviceState.error,
-    );
+    // try to connect to device
+    try {
+      state = DeviceState.connecting;
+      Mds.connect(
+        address,
+        (serial) {
+          _serial = serial;
+          state = DeviceState.connected;
+        },
+        () => state = DeviceState.disconnected,
+        () => state = DeviceState.error,
+      );
+      // Throw DeviceException if an error occurs.
+    } on Exception catch (e) {
+      state = DeviceState.error;
+      throw DeviceException(
+          'Error during connect to device - error: $e', address);
+    }
   }
 
   /// Method for listening to heartrate data. The data is fed into a stream that can be listened to.
   @override
   void startHR() {
-    if (/* state == DeviceState.connected && */ _serial != null) {
+    if (_serial != null) {
       _hrSubscription = MdsAsync.subscribe(
               Mds.createSubscriptionUri(_serial!, "/Meas/HR"), "{}")
           .listen((event) {
@@ -160,4 +168,17 @@ class MovesenseHRMonitor extends MoveSenseBLESensor {
 
   /// Disconnect from MoveSense Device.
   void disconnect() => Mds.disconnect(address);
+}
+
+/// An exception for devices.
+///
+/// To be used in try ... catch
+class DeviceException implements Exception {
+  String message;
+  String address;
+
+  DeviceException(this.message, this.address);
+
+  @override
+  String toString() => '$runtimeType - $message, device address: $address';
 }

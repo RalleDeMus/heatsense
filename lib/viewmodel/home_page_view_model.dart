@@ -5,7 +5,7 @@ class HomePageViewModel extends ChangeNotifier {
   MovesenseHRMonitor? get hrMonitor =>
       MoveSenseDeviceController().connectedDevice;
 
-  bool get running => hrMonitor?.isRunning ?? false;
+  bool running = false;
 
   //Streams of data needed on the homepage
   Stream<DeviceState> get stateChange =>
@@ -25,34 +25,55 @@ class HomePageViewModel extends ChangeNotifier {
 
   /// Starts showing the data on the homepage and initializes storage.
   void start() {
-    if (hrMonitor?.state == DeviceState.connected) {
-      hrMonitor?.startTemp();
+    // try to start the data collection.
+    try {
+      if (hrMonitor?.state == DeviceState.connected) {
+        hrMonitor?.startTemp();
 
-      hrMonitor?.startHR();
+        hrMonitor?.startHR();
 
-      hrMonitor?.startECG();
+        hrMonitor?.startECG();
 
-      hrMonitor?.state = DeviceState.sampling;
+        hrMonitor?.state = DeviceState.sampling;
 
-      Storage().init();
-      Storage().setDeviceAndStartUpload(hrMonitor!);
-    } else if (hrMonitor?.state == DeviceState.sampling) {
-      hrMonitor?.resumeTemp();
+        // initialize storage
+        Storage().init();
+        Storage().setDeviceAndStartUpload(hrMonitor!);
+        //print('>>> start initialized');
+      } else if (hrMonitor?.state == DeviceState.sampling) {
+        hrMonitor?.resumeTemp();
 
-      hrMonitor?.resumeHR();
+        hrMonitor?.resumeHR();
 
-      hrMonitor?.resumeECG();
+        hrMonitor?.resumeECG();
+        //print('>>> resumed');
+      }
+
+      running = true;
+      notifyListeners();
+// print error if error occurs.
+    } on Exception catch (e) {
+      //print('Start of data collection failed: $e');
+      hrMonitor?.state = DeviceState.error;
     }
-    notifyListeners();
   }
 
   /// Pauses the data shown on the homepage.
   void stop() {
-    //hrMonitor?.disconnect();
-    hrMonitor?.pauseTemp();
-    hrMonitor?.pauseHR();
-    hrMonitor?.pauseECG();
-    Storage().dump();
-    notifyListeners();
+    // try to pause data collection
+    try {
+      hrMonitor?.pauseTemp();
+      hrMonitor?.pauseHR();
+      hrMonitor?.pauseECG();
+      Storage().dump();
+
+      running = false;
+      notifyListeners();
+      //print('>>> paused');
+      // catch error
+    } on Exception catch (e) {
+      debugPrint('Stop of data collection failed: $e');
+      hrMonitor?.state = DeviceState.error;
+    }
   }
 }
